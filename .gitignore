@@ -1,0 +1,11 @@
+# Ignore Python cache files
+__pycache__/
+src/writers/__pycache__/
+src/getters/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.vscode
+.pytest_cache
+pgtapme_generated_files
+.env

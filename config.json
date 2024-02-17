@@ -1,0 +1,25 @@
+{
+    "output_dir": "pgtapme_generated_files",
+    "module_types": [
+        "cluster",
+        "language",
+        "tablespace",
+        "role",
+        "database",
+        "schema",
+        "extension",
+        "table",
+        "column",
+        "index",
+        "rule",
+        "foreign_key",
+        "trigger",
+        "sequence",
+        "view",
+        "materialized_view",
+        "foreign_table",
+        "function",
+        "enum",
+        "domain"
+    ]
+}
