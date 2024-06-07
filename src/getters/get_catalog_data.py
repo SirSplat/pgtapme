@@ -174,8 +174,8 @@ def get_schemas_are(cursor: TextIO) -> List[str]:
         FROM
             pg_catalog.pg_namespace
         WHERE
-            pg_namespace.nspname NOT IN ( 'information_schema' ) AND
-            pg_namespace.nspname NOT ILIKE 'pg_%'
+            pg_namespace.nspname NOT IN ( 'information_schema', 'pg_catalog' ) AND
+            pg_namespace.nspname NOT ILIKE 'pg_t%'
     """
     )
     records = cursor.fetchone()
