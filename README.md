@@ -2,26 +2,20 @@
 
 PGTapMe
 
-PGTapMe is a tool for generating pgTap tests for PostgreSQL databases. It provides a modular and extensible framework to create tests for different aspects of your database schema.
+PGtapme is a tool for generating pgTap tests for PostgreSQL databases. It provides a modular and extensible framework to create tests for different aspects of your database schema.
 Configuration
 
-Before using PGTapMe, you need to configure the database connection and set up the types of tests you want to generate. Edit the config.json file to include your database connection details and specify the test types you are interested in.
+Before using PGtapme, you need to configure the database connection and set up the types of tests you want to generate. Edit the .env file to include your database connection details and specify the test types you are interested in.
 
-json
-
-{
-    "database": "your_database_name",
-    "user": "your_username",
-    "password": "your_password",
-    "host": "your_host",
-    "port": your_port_number,
-    "output_dir": "t",
-    "test_types": ["cluster", "language", "tablespace", "role"]
-}
+DATABASE_NAME = dvdrental
+DATABASE_USER = dbo
+DATABASE_USER_PASSWORD = mysecretpassword
+DATABASE_HOST = localhost
+DATABASE_PORT = 5432
 
 Usage
 
-To run PGTapMe, execute the pgtapme.py script. This script reads the configuration from config.json and generates pgTap tests for the specified test types.
+To run PGtapme, execute the pgtapme.py script. This script reads the configurations from config.json and the .env files then generates PGTap tests for the specified test types.
 
 bash
 

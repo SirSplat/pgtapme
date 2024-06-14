@@ -1,0 +1,45 @@
+services:
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/code
+    depends_on:
+      - db
+
+  db:
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+
+  # sqitch:
+  #   image: sqitch/sqitch:latest
+  #   environment:
+  #     SQITCH_PASSWORD: password
+  #   entrypoint: ["/bin/bash", "-c", "sqitch deploy db:pg://postgres:password@db/dvdrental"]
+  #   depends_on:
+  #     - db
+  #   volumes:
+  #     - ./sqitch:/code/sqitch
+
+  # pgtap:
+  #   image: pgtap/pgtap:latest
+  #   depends_on:
+  #     - db
+  #     - sqitch
+  #   entrypoint: ["/bin/bash", "-c", "pg_prove --dbname=postgresql://postgres:password@db:5432/dvdrental /code/tests/*"]
+  #   volumes:
+  #     - ./tests:/code/tests
+
+volumes:
+  postgres_data:

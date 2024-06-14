@@ -1,0 +1,22 @@
+{
+    "name": "PGTapMe Dev Container",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/code",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.shell.linux": "/bin/bash"
+            },
+            "extensions": [
+                "ms-python.python",
+                "ms-azuretools.vscode-docker",
+                "eamodio.gitlens",
+                "ms-vscode-remote.remote-containers"
+            ]
+        }
+    },
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/code,type=bind"
+    ]
+}
