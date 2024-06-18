@@ -1,0 +1,168 @@
+%syntax-version=1.0.0
+%project=db_design_intro
+%uri=https://github.com/SirSplat/DB_Design_Intro.git
+
+
+appschema 2024-06-01T07:48:10Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add DVD Rental application schema.
+data_types/mpaa_rating-ENUM [appschema] 2024-06-01T08:07:45Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # ADD mpaa rating ENUM.
+data_types/year-DOMAIN [appschema] 2024-06-01T08:32:39Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # ADD rental.year domain.
+functions/_group_concat(text-text)-func [appschema] 2024-06-01T08:44:58Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental._group_concat(text, text) function.
+functions/last_day(timestamp_without_time_zone)-func [appschema] 2024-06-01T09:06:25Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.last_day(timestamp without time zone) function.
+functions/last_updated()-trg-func [appschema] 2024-06-01T09:53:25Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.last_updated() trigger function.
+sequences/customer_customer_id_seq [appschema] 2024-06-01T12:03:04Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add customer.customer_id sequence.
+tables/customer [appschema sequences/customer_customer_id_seq] 2024-06-01T12:10:41Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.customer table.
+functions/group_concat(text)-agg [appschema functions/_group_concat(text-text)-func] 2024-06-01T12:25:11Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.group_concat(text) aggregate.
+sequences/actor_actor_id_seq [appschema] 2024-06-01T12:30:19Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.actor_actor_id sequence.
+tables/actor [appschema sequences/actor_actor_id_seq] 2024-06-05T07:50:59Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.actor table.
+sequences/category_category_id_seq [appschema] 2024-06-05T07:53:53Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.category_category_id sequence.
+tables/category [appschema sequences/category_category_id_seq] 2024-06-05T07:56:48Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.category table.
+sequences/language_language_id_seq [appschema] 2024-06-05T08:14:38Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.language_language_id sequence.
+tables/language [appschema sequences/language_language_id_seq] 2024-06-05T08:20:16Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.language table.
+sequences/film_film_id_seq [appschema] 2024-06-05T07:58:37Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.film_film_id sequence.
+tables/film [appschema sequences/film_film_id_seq] 2024-06-05T08:25:15Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.fillm table.
+tables/film_actor [appschema] 2024-06-05T08:29:29Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.film_actor table.
+tables/film_category [appschema] 2024-06-05T08:31:12Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.film_category table.
+sequences/address_address_id_seq [appschema] 2024-06-05T08:46:12Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.address_address_id sequence.
+tables/address [appschema sequences/address_address_id_seq] 2024-06-05T08:49:44Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.address table.
+sequences/country_country_id_seq [appschema] 2024-06-05T08:52:27Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.country_country_id sequence.
+tables/country [appschema sequences/country_country_id_seq] 2024-06-05T08:55:04Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.country table.
+sequences/city_city_id_seq [appschema] 2024-06-05T08:57:03Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.city_city_id sequence.
+tables/city [appschema sequences/city_city_id_seq] 2024-06-05T08:59:34Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.city table.
+sequences/inventory_inventory_id_seq [appschema] 2024-06-05T09:16:11Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.inventory_inventory_id sequence.
+tables/inventory [appschema sequences/inventory_inventory_id_seq] 2024-06-05T09:18:33Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.inventory table.
+sequences/payment_payment_id_seq [appschema] 2024-06-05T09:20:34Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.payment_payment_id sequence.
+tables/payment [appschema sequences/payment_payment_id_seq] 2024-06-05T09:22:16Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.payment table.
+sequences/rental_rental_id_seq [appschema] 2024-06-05T09:23:50Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.rental_rental_id sequence.
+tables/rental [appschema sequences/rental_rental_id_seq] 2024-06-05T09:25:08Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.rental table.
+sequences/staff_staff_id_seq [appschema] 2024-06-05T09:26:36Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.staff_staff_id sequence.
+tables/staff [appschema sequences/staff_staff_id_seq] 2024-06-05T09:28:13Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.staff table.
+sequences/store_store_id_seq [appschema] 2024-06-05T09:29:41Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.store_store_id sequence.
+tables/store [appschema sequences/store_store_id_seq] 2024-06-05T09:31:09Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.store table.
+functions/inventory_in_stock(integer)-func [appschema tables/rental tables/inventory] 2024-06-05T09:39:38Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.inventory_in_stock(integer) function.
+functions/film_in_stock(integer-integer)-func [appschema tables/inventory functions/inventory_in_stock(integer)-func] 2024-06-05T09:43:31Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.film_in_stock(integer, integer) function.
+functions/film_not_in_stock(integer-integer)-func [appschema tables/inventory functions/inventory_in_stock(integer)-func] 2024-06-05T09:46:00Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.film_not_in_stock(integer, integer) function.
+functions/get_customer_balance(integer-timestamp_without_time_zone)-func [appschema tables/film tables/inventory tables/rental tables/payment] 2024-06-05T09:50:37Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.get_customer_balance(integer, timestamp without time zone) function.
+functions/inventory_held_by_customer(integer)-func [appschema tables/rental] 2024-06-05T09:53:57Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.inventory_held_by_customer(integer) function.
+functions/rewards_report(integer-numeric)-func [appschema tables/payment tables/customer] 2024-06-05T09:59:57Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.rewards_report(integer-numeric) function.
+views/actor_info [appschema tables/film tables/film_category tables/film_actor tables/actor tables/category] 2024-06-05T10:15:57Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.actor_info view.
+views/customer_list [appschema tables/customer tables/address tables/city tables/country] 2024-06-05T10:22:04Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.customer_list view.
+views/film_list [appschema tables/category tables/film_category tables/film tables/film_actor tables/actor] 2024-06-05T10:24:53Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.film_list view.
+views/nicer_but_slower_film_list [appschema tables/category tables/film_category tables/film tables/film_actor tables/actor] 2024-06-05T10:26:46Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.nicer_by_slower_film_list view.
+views/sales_by_film_category [appschema tables/payment tables/rental tables/inventory tables/film tables/film_category tables/category] 2024-06-05T10:29:50Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.sales_by_film_category view.
+views/sales_by_store [appschema tables/payment tables/rental tables/inventory tables/store tables/address tables/city tables/country tables/staff] 2024-06-05T10:33:00Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.sales_by_store view.
+views/staff_list [appschema tables/staff tables/address tables/city tables/country] 2024-06-05T10:35:16Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.staff_list view.
+@v0.1-relations 2024-06-05T10:39:46Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Tag v0.1-pre-data
+
+
+
+data/actor [@v0.1-relations] 2024-06-05T11:08:03Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Populate rental.actor table.
+data/address [@v0.1-relations] 2024-06-05T13:12:15Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Populate rental.address table.
+data/category [@v0.1-relations] 2024-06-05T13:21:15Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Populate rental.category table.
+data/city [@v0.1-relations] 2024-06-05T13:28:10Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Populate rental.city table.
+data/country [@v0.1-relations] 2024-06-05T13:29:57Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Populate rental.country table.
+data/customer [@v0.1-relations] 2024-06-05T13:29:58Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Populate rental.customer table.
+data/film [@v0.1-relations] 2024-06-05T13:29:58Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Populate rental.film table.
+data/film_actor [@v0.1-relations] 2024-06-05T13:29:58Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Populate rental.film_actor table.
+data/film_category [@v0.1-relations] 2024-06-05T13:29:58Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Populate rental.film_category table.
+data/inventory [@v0.1-relations] 2024-06-05T13:29:59Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Populate rental.inventory table.
+data/language [@v0.1-relations] 2024-06-05T13:29:59Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Populate rental.language table.
+data/payment [@v0.1-relations] 2024-06-05T13:29:59Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Populate rental.payment table.
+data/rental [@v0.1-relations] 2024-06-05T13:29:59Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Populate rental.rental table.
+data/staff [@v0.1-relations] 2024-06-05T13:30:00Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Populate rental.staff table.
+data/store [@v0.1-relations] 2024-06-05T13:30:00Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Populate rental.store table.
+@v0.1-data 2024-06-05T13:30:46Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Tag v0.1-data
+
+
+
+data/actor_actor_id_seq [@v0.1-data] 2024-06-12T13:53:23Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Set rental.actor.actor_id sequence.
+data/address_address_id_seq [@v0.1-data] 2024-06-12T13:54:44Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Set rental.address.address_id sequence.
+data/category_category_id_seq [@v0.1-data] 2024-06-12T13:55:40Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Set rental.category.category_id sequence.
+data/city_city_id_seq [@v0.1-data] 2024-06-12T13:56:18Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Set rental.city.city_id sequence.
+data/country_country_id_seq [@v0.1-data] 2024-06-12T13:57:11Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Set rental.country.country_id sequence.
+data/customer_customer_id_seq [@v0.1-data] 2024-06-12T13:58:04Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Set rental.customer.customer_id sequence.
+data/film_film_id_seq [@v0.1-data] 2024-06-12T13:58:45Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Set rental.film.film_id sequence.
+data/inventory_inventory_id_seq [@v0.1-data] 2024-06-12T13:59:30Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Set rental.inventory.inventory_id sequence.
+data/language_language_id_seq [@v0.1-data] 2024-06-12T14:00:15Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Set rental.language.language_id sequence.
+data/payment_payment_id_seq [@v0.1-data] 2024-06-12T14:01:00Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Set rental.payment.payment_id sequence.
+data/rental_rental_id_seq [@v0.1-data] 2024-06-12T14:01:49Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Set rental.rental.rental_id sequence.
+data/staff_staff_id_seq [@v0.1-data] 2024-06-12T14:02:29Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Set rental.staff.staff_id sequence.
+data/store_store_id_seq [@v0.1-data] 2024-06-12T14:03:10Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Set rental.store.store_id sequence.
+@v0.2-data 2024-06-12T14:10:47Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Tag v0.2-data
+
+
+
+indexes/actor_pk [@v0.1-relations] 2024-06-05T17:37:32Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.actor primary key.
+indexes/address_pk [@v0.1-relations] 2024-06-12T11:49:53Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.address primary key.
+indexes/category_pk [@v0.1-relations] 2024-06-12T11:50:09Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.category primary key.
+indexes/city_pk [@v0.1-relations] 2024-06-12T11:51:08Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.city primary key.
+indexes/country_pk [@v0.1-relations] 2024-06-12T11:51:20Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.country primary key.
+indexes/customer_pk [@v0.1-relations] 2024-06-12T11:51:27Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.customer primary key.
+indexes/film_actor_pk [@v0.1-relations] 2024-06-12T11:51:35Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.film_actor primary key.
+indexes/film_category_pk [@v0.1-relations] 2024-06-12T11:51:43Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.film_category primary key.
+indexes/film_pk [@v0.1-relations] 2024-06-12T11:51:50Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.film primary key.
+indexes/inventory_pk [@v0.1-relations] 2024-06-12T11:52:01Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.inventory primary key.
+indexes/language_pk [@v0.1-relations] 2024-06-12T11:52:07Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.language primary key.
+indexes/payment_pk [@v0.1-relations] 2024-06-12T11:52:13Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.payment primary key.
+indexes/rental_pk [@v0.1-relations] 2024-06-12T11:52:19Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.rental primary key.
+indexes/staff_pk [@v0.1-relations] 2024-06-12T11:52:26Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.staff primary key.
+indexes/store_pk [@v0.1-relations] 2024-06-12T11:52:32Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.store primary key.
+indexes/film_fulltext_idx [@v0.1-relations] 2024-06-12T11:53:25Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add film.fulltext index.
+indexes/film_language_id_idx [@v0.1-relations] 2024-06-12T11:53:30Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add film.language_id index.
+indexes/film_title_idx [@v0.1-relations] 2024-06-12T11:53:36Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add film.title index.
+indexes/actor_last_name_idx [@v0.1-relations] 2024-06-12T11:53:40Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add actor.last_name index.
+indexes/customer_address_id_idx [@v0.1-relations] 2024-06-12T11:53:45Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add customer.address_id index.
+indexes/customer_store_id_idx [@v0.1-relations] 2024-06-12T11:53:50Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add customer.store_id index.
+indexes/customer_last_name_idx [@v0.1-relations] 2024-06-12T11:53:54Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add customer.last_name index.
+indexes/address_city_id_idx [@v0.1-relations] 2024-06-12T11:54:00Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add address.city_id index.
+indexes/city_country_id_idx [@v0.1-relations] 2024-06-12T11:54:04Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add city.country_id index.
+indexes/payment_customer_id_idx [@v0.1-relations] 2024-06-12T11:54:09Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add payment.customer_id index.
+indexes/payment_rental_id_idx [@v0.1-relations] 2024-06-12T11:54:15Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add payment.rental_id index.
+indexes/payment_staff_id_idx [@v0.1-relations] 2024-06-12T11:54:23Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add payment.staff_id index.
+indexes/film_actor_film_id_idx [@v0.1-relations] 2024-06-12T11:54:27Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add film_actor.film_id index.
+indexes/rental_inventory_id_idx [@v0.1-relations] 2024-06-12T11:54:33Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.inventory_id index.
+indexes/inventory_store_id_film_id_idx [@v0.1-relations] 2024-06-12T11:54:37Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add inventory.store_id_film_id index.
+indexes/store_manager_staff_id_uidx [@v0.1-relations] 2024-06-12T13:15:55Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add store.manager_staff_id uidx.
+indexes/rental_rental_date_inventory_id_customer_id_uidx [@v0.1-relations] 2024-06-12T13:18:11Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.rental_date-inventory_id-customer_id uidx.
+@v0.1-indexes 2024-06-12T10:39:46Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Tag v0.1-post-data
+
+
+
+triggers/film_fulltext_trg [@v0.1-relations] 2024-06-13T10:48:35Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.film fulltext trigger.
+triggers/actor_last_updated_trg [@v0.1-relations] 2024-06-13T10:54:39Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.actor last_updated trigger.
+triggers/address_last_updated_trg [@v0.1-relations] 2024-06-13T10:55:09Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.address last_updated trigger.
+triggers/category_last_updated_trg [@v0.1-relations] 2024-06-13T10:55:20Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.category last_updated trigger.
+triggers/city_last_updated_trg [@v0.1-relations] 2024-06-13T10:55:28Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.city last_updated trigger.
+triggers/country_last_updated_trg [@v0.1-relations] 2024-06-13T10:55:35Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.country last_updated trigger.
+triggers/customer_last_updated_trg [@v0.1-relations] 2024-06-13T10:55:42Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.customer last_updated trigger.
+triggers/film_last_updated_trg [@v0.1-relations] 2024-06-13T10:55:49Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.film last_updated trigger.
+triggers/film_actor_last_updated_trg [@v0.1-relations] 2024-06-13T10:55:55Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.film_actor last_updated trigger.
+triggers/film_category_last_updated_trg [@v0.1-relations] 2024-06-13T10:56:07Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.film_category last_updated trigger.
+triggers/inventory_last_updated_trg [@v0.1-relations] 2024-06-13T10:56:28Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.inventory last_updated trigger.
+triggers/language_last_updated_trg [@v0.1-relations] 2024-06-13T10:56:37Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.language last_updated trigger.
+triggers/rental_last_updated_trg [@v0.1-relations] 2024-06-13T10:56:44Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.rental last_updated trigger.
+triggers/staff_last_updated_trg [@v0.1-relations] 2024-06-13T10:56:53Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.staff last_updated trigger.
+triggers/store_last_updated_trg [@v0.1-relations] 2024-06-13T10:56:59Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.store last_updated trigger.
+@v0.1-triggers 2024-06-13T11:51:21Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Tag v0.1-triggers
+
+
+
+foreign_keys/customer_address_id_fk [@v0.1-indexes] 2024-06-12T11:55:07Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add customer.address_id foreign key.
+foreign_keys/film_actor_actor_id_fk [@v0.1-indexes] 2024-06-12T11:55:12Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add film_actor.actor_id foreign key.
+foreign_keys/film_actor_film_id_fk [@v0.1-indexes] 2024-06-12T11:55:16Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add film_actor.film_id foreign key.
+foreign_keys/film_category_category_id_fk [@v0.1-indexes] 2024-06-12T11:55:20Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add film_category.category_id foreign key.
+foreign_keys/film_category_film_id_fk [@v0.1-indexes] 2024-06-12T11:55:24Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add film_category.film_id foreign key.
+foreign_keys/film_language_id_fk [@v0.1-indexes] 2024-06-12T11:55:28Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add film.language_id foreign key.
+foreign_keys/address_city_id_fk [@v0.1-indexes] 2024-06-12T11:55:33Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add address.city_id foreign key.
+foreign_keys/city_country_id_fk [@v0.1-indexes] 2024-06-12T11:55:37Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add city.country_id foreign key.
+foreign_keys/inventory_film_id_fk [@v0.1-indexes] 2024-06-12T11:55:41Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add inventory.film_id foreign key.
+foreign_keys/payment_customer_id_fk [@v0.1-indexes] 2024-06-12T11:55:46Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add payment.customer_id foreign key.
+foreign_keys/payment_rental_id_fk [@v0.1-indexes] 2024-06-12T11:55:50Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add payment.rental_id foreign key.
+foreign_keys/payment_staff_id_fk [@v0.1-indexes] 2024-06-12T11:55:54Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add payment.staff_id foreign key.
+foreign_keys/rental_customer_id_fk [@v0.1-indexes] 2024-06-12T11:55:58Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.customer_id foreign key.
+foreign_keys/rental_inventory_id_fk [@v0.1-indexes] 2024-06-12T11:56:02Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.inventory_id foreign key.
+foreign_keys/rental_staff_id_fk [@v0.1-indexes] 2024-06-12T11:56:06Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add rental.staff_id foreign key.
+foreign_keys/staff_address_id_fk [@v0.1-indexes] 2024-06-12T11:56:10Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add staff.address_id foreign key.
+foreign_keys/store_address_id_fk [@v0.1-indexes] 2024-06-12T11:56:13Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add store.address_id foreign key.
+foreign_keys/store_manager_staff_id_fk [@v0.1-indexes] 2024-06-12T11:56:17Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add store.manager_staff_id foreign key.
+@v1.0-restore 2024-06-13T11:52:28Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Tag v1.0-restore
+

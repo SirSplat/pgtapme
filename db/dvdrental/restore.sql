@@ -1386,7 +1386,7 @@ CREATE UNIQUE INDEX rental_rental_date_inventory_id_customer_id_uidx ON rental.r
 -- Name: film film_fulltext_trigger; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
-CREATE OR REPLACE TRIGGER film_fulltext_trg BEFORE INSERT OR UPDATE ON rental.film FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('fulltext', 'pg_catalog.english', 'title', 'description');
+CREATE OR REPLACE TRIGGER fulltext_trg BEFORE INSERT OR UPDATE ON rental.film FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('fulltext', 'pg_catalog.english', 'title', 'description');
 
 
 --

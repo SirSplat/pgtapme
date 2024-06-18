@@ -5,9 +5,6 @@
     "workspaceFolder": "/code",
     "customizations": {
         "vscode": {
-            "settings": {
-                "terminal.integrated.shell.linux": "/bin/bash"
-            },
             "extensions": [
                 "ms-python.python",
                 "ms-azuretools.vscode-docker",
@@ -17,6 +14,9 @@
         }
     },
     "mounts": [
-        "source=${localWorkspaceFolder},target=/code,type=bind"
+        "source=${localWorkspaceFolder}/code,target=/code,type=bind",
+        "source=${localWorkspaceFolder}/sqitch,target=/mnt/sqitch,type=bind",
+        "source=${localWorkspaceFolder}/pg_prove,target=/mnt/pg_prove,type=bind",
+        "source=${localWorkspaceFolder}/pgtap_generated_files,target=/mnt/tests,type=bind"
     ]
 }

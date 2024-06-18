@@ -9,6 +9,7 @@ ESQL
 
 psql -v ON_ERROR_STP=1 --username "dbo" --dbname "postgres" <<-ESQL
     CREATE DATABASE dvdrental TEMPLATE template0;
+    COMMENT ON DATABASE dvdrental IS 'Home of DVD rental application data, DDL and DML.';
 ESQL
 
 psql -v ON_ERROR_STOP=1 --username "dbo" --dbname "dvdrental" <<-ESQL

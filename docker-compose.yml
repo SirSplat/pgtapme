@@ -4,9 +4,11 @@ services:
       context: ./app
       dockerfile: Dockerfile
     volumes:
-      - ./:/code
+      - ./code:/code
     depends_on:
       - db
+      - sqitch
+      - pg_prove
 
   db:
     build:
@@ -21,25 +23,28 @@ services:
     ports:
       - "5432:5432"
 
+  sqitch:
+    image: sqitch/sqitch
+    volumes:
+      - ./sqitch:/mnt/sqitch
+    working_dir: /mnt/sqitch
+    entrypoint: /bin/sh
+    command: -c "tail -f /mnt/sqitch/sqitch.plan"
+    depends_on:
+      - db
 
-  # sqitch:
-  #   image: sqitch/sqitch:latest
-  #   environment:
-  #     SQITCH_PASSWORD: password
-  #   entrypoint: ["/bin/bash", "-c", "sqitch deploy db:pg://postgres:password@db/dvdrental"]
-  #   depends_on:
-  #     - db
-  #   volumes:
-  #     - ./sqitch:/code/sqitch
-
-  # pgtap:
-  #   image: pgtap/pgtap:latest
-  #   depends_on:
-  #     - db
-  #     - sqitch
-  #   entrypoint: ["/bin/bash", "-c", "pg_prove --dbname=postgresql://postgres:password@db:5432/dvdrental /code/tests/*"]
-  #   volumes:
-  #     - ./tests:/code/tests
+  pg_prove:
+    image: itheory/pg_prove
+    volumes:
+      - ./code/pgtapme_generated_files:/mnt/tests
+      - ./pg_prove:/mnt/pg_prove
+    environment:
+      PGPASSWORD: mysecretpassword
+    entrypoint: /bin/sh
+    command: -c "tail -f /mnt/pg_prove/pg_prove.sh"
+    depends_on:
+      - db
+      - sqitch
 
 volumes:
   postgres_data:
