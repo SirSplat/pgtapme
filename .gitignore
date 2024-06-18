@@ -7,4 +7,3 @@ src/getters/__pycache__/
 *.pyd
 .vscode
 .pytest_cache
-.env
