@@ -7,8 +7,6 @@ services:
       - ./code:/code
     depends_on:
       - db
-      - sqitch
-      - pg_prove
 
   db:
     build:
@@ -26,17 +24,19 @@ services:
   sqitch:
     image: sqitch/sqitch
     volumes:
+      - ./sqitch/.sqitch/sqitch.conf:/home/.sqitch/sqitch.conf
+      - ./sqitch/sqitch.sh:/home/sqitch.sh
       - ./sqitch:/mnt/sqitch
     working_dir: /mnt/sqitch
-    entrypoint: /bin/sh
-    command: -c "tail -f /mnt/sqitch/sqitch.plan"
+    entrypoint: /bin/bash
+    command: -c "tail -f /home/sqitch.sh"
     depends_on:
       - db
 
   pg_prove:
     image: itheory/pg_prove
     volumes:
-      - ./code/pgtapme_generated_files:/mnt/tests
+      - ./code/pgtapme_generated_files_dvdrental:/mnt/tests/dvdrental
       - ./pg_prove:/mnt/pg_prove
     environment:
       PGPASSWORD: mysecretpassword
@@ -44,7 +44,6 @@ services:
     command: -c "tail -f /mnt/pg_prove/pg_prove.sh"
     depends_on:
       - db
-      - sqitch
 
 volumes:
   postgres_data:

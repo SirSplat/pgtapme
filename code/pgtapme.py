@@ -37,8 +37,8 @@ def main() -> None:
         logging.error(f"An unexpected error occurred: {e}", exc_info=True)
 
     """
-    This creates the output_dir 't' in the directory where pgtapme.py is executed
-        from i.e. $(pwd)/pgtapme_generated_files/{database_name}/t
+    This creates the output_dir 'pgtapme_generated_files_{database_name}' in the directory where pgtapme.py is executed
+        from i.e. $(pwd)/pgtapme_generated_files_dvdrental
     """
     logging.info(
         "TODO: Figure out how to get the generated tests created where pgtapme.py was executed from!"

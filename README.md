@@ -63,3 +63,16 @@ ROLLBACK;
 License
 
 This project is licensed under the MIT License.
+
+
+
+
+
+
+
+
+
+
+
+[target "pgtapme"]
+	uri = db:pg://dbo:mysecretpassword@db:5432/pgtapme
