@@ -31,6 +31,7 @@ services:
       - ./sqitch/pgtapme:/mnt/sqitch/pgtapme
       - ./sqitch/sqitch.conf:/mnt/sqitch/sqitch.conf
       - ./sqitch/.sqitch/.pgpass:/home/.pgpass:ro
+      - ./sqitch/entrypoint.sh:/mnt/sqitch/entrypoint.sh
     working_dir: /mnt/sqitch
     entrypoint: /mnt/sqitch/entrypoint.sh
     command: -c "tail -f /home/sqitch.sh"
