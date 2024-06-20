@@ -11,10 +11,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash -l {0}
-        fail-fast: true
 
     steps:
     - name: Checkout code
