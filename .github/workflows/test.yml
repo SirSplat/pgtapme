@@ -26,7 +26,20 @@ jobs:
 
     - name: Build and Start Docker Containers
       run: |
-        docker-compose -f docker-compose.yml up -d --build
+        docker-compose -f docker-compose.yml up --build
+
+    - name: Print Sqitch Container Logs
+      run: |
+        docker-compose logs sqitch
+
+    - name: Inspect Sqitch Container
+      run: |
+        docker inspect $(docker-compose ps -q sqitch)
+
+    - name: Print Sqitch Container Details
+      run: |
+        docker-compose ps -a
+        docker-compose logs sqitch
 
     - name: Wait for Database to be Ready
       run: |
