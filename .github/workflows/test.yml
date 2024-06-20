@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - name: Checkout code
@@ -27,6 +27,12 @@ jobs:
     - name: Build and Start Docker Containers
       run: |
         docker-compose -f docker-compose.yml up --build
+        timeout-minutes: 5  # Timeout to ensure the step doesn't hang indefinitely
+
+    - name: Print Docker Container Status and Logs
+      run: |
+        echo "Docker container status:"
+        docker ps -a
 
     - name: Print Sqitch Container Logs
       run: |

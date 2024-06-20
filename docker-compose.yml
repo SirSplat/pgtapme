@@ -34,7 +34,7 @@ services:
       - ./sqitch/entrypoint.sh:/mnt/sqitch/entrypoint.sh
     working_dir: /mnt/sqitch
     entrypoint: /bin/bash
-    command: -c "tail -f /home/sqitch.sh"
+    command: -c "tail -f /dev/null"
     depends_on:
       - db
 
@@ -46,7 +46,7 @@ services:
     environment:
       PGPASSWORD: mysecretpassword
     entrypoint: /bin/sh
-    command: -c "tail -f /mnt/pg_prove/pg_prove.sh"
+    command: -c "tail -f /dev/null"
     depends_on:
       - db
 
