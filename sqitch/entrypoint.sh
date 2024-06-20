@@ -4,4 +4,4 @@
 chmod 600 /home/.pgpass
 
 # Execute the passed command
-exec "$@"
+exit 0
