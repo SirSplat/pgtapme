@@ -63,6 +63,10 @@ jobs:
           sleep 5
         done
 
+    - name: :Fix sqitch pgpass permissions
+      run: |
+        docker-compose exec -T sqitch chmod 600 /home/.pgpass
+
     - name: Deploy Database with Sqitch (Initial Deploy)
       run: |
         docker-compose exec -T sqitch sqitch deploy --target dvdrental --chdir dvdrental
