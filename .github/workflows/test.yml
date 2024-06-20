@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
@@ -27,7 +27,7 @@ jobs:
     - name: Build and Start Docker Containers
       run: |
         docker-compose -f docker-compose.yml up --build
-        timeout-minutes: 5  # Timeout to ensure the step doesn't hang indefinitely
+        timeout-minutes: 10  # Timeout to ensure the step doesn't hang indefinitely
 
     - name: Print Docker Container Status and Logs
       run: |
@@ -100,7 +100,7 @@ jobs:
 
     - name: Deploy Database with Sqitch (Initial Deploy)
       run: |
-        docker-compose exec -T sqitch bash -c 'PGUSER=dbo PGPASSWORD=mysecretpassword sqitch deploy --target dvdrental --chdir dvdrental
+        docker-compose exec -T sqitch bash PGUSER=dbo PGPASSWORD=mysecretpassword sqitch deploy --target dvdrental --chdir dvdrental
 
     - name: Generate Database Tests with PGtapme (--db-name)
       run: |
