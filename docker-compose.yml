@@ -40,8 +40,7 @@ services:
   pg_prove:
     image: itheory/pg_prove
     volumes:
-      - ./code/pgtapme_generated_files_dvdrental:/mnt/tests/dvdrental
-      - ./code/pgtapme_generated_files_pgtapme:/mnt/tests/pgtapme
+      - ./code/pgtapme_generated_files:/mnt/tests
       - ./pg_prove:/mnt/pg_prove
     environment:
       PGPASSWORD: mysecretpassword

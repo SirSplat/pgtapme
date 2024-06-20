@@ -26,7 +26,25 @@ def parse_command_line_args():
     parser.add_argument(
         "--module-type", dest="module_type", default=None, help="Override module types"
     )
-
+    # New arguments for database connection
+    parser.add_argument(
+        "--db-name", dest="database_name", default=None, help="Override database name"
+    )
+    parser.add_argument(
+        "--db-user", dest="database_user", default=None, help="Override database user"
+    )
+    parser.add_argument(
+        "--db-password",
+        dest="database_user_password",
+        default=None,
+        help="Override database user password",
+    )
+    parser.add_argument(
+        "--db-host", dest="database_host", default=None, help="Override database host"
+    )
+    parser.add_argument(
+        "--db-port", dest="database_port", default=None, help="Override database port"
+    )
     return parser.parse_args()
 
 
@@ -212,19 +230,35 @@ def set_plan_count(test_file_path):
 @log_function_call
 def connect_to_database():
     load_dotenv()
+    args = parse_command_line_args()
 
-    DATABASE_NAME = os.getenv("DATABASE_NAME")
-    DATABASE_USER = os.getenv("DATABASE_USER")
-    DATABASE_USER_PASSWORD = os.getenv("DATABASE_USER_PASSWORD")
-    DATABASE_HOST = os.getenv("DATABASE_HOST")
-    DATABASE_PORT = os.getenv("DATABASE_PORT")
+    # Use command-line arguments if provided, otherwise fall back to .env variables
+    database_name = args.database_name or os.getenv("DATABASE_NAME")
+    database_user = args.database_user or os.getenv("DATABASE_USER")
+    database_user_password = args.database_user_password or os.getenv(
+        "DATABASE_USER_PASSWORD"
+    )
+    database_host = args.database_host or os.getenv("DATABASE_HOST")
+    database_port = args.database_port or os.getenv("DATABASE_PORT")
+
+    # Check if all necessary parameters are provided
+    if not all(
+        [
+            database_name,
+            database_user,
+            database_user_password,
+            database_host,
+            database_port,
+        ]
+    ):
+        raise ValueError("Missing one or more required database connection parameters.")
 
     conn = psycopg2.connect(
-        database=DATABASE_NAME,
-        user=DATABASE_USER,
-        password=DATABASE_USER_PASSWORD,
-        host=DATABASE_HOST,
-        port=DATABASE_PORT,
+        database=database_name,
+        user=database_user,
+        password=database_user_password,
+        host=database_host,
+        port=database_port,
     )
     return conn
 
