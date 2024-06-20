@@ -28,7 +28,7 @@ jobs:
       run: |
         docker-compose -f docker-compose.yml up -d --build
 
-    - name: Wait for Services to be Ready
+    - name: Wait for Database to be Ready
       run: |
         for i in {1..30}; do
           if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q db) | grep -q "running"; then
@@ -38,15 +38,23 @@ jobs:
           echo "Waiting for database..."
           sleep 5
         done
+        if ! docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q db) | grep -q "running"; then
+          echo "Database did not start in time"
+          exit 1
+        fi
         for i in {1..30}; do
           if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q app) | grep -q "running"; then
-            echo "app is ready!"
+            echo "App is ready!"
             break
           fi
           echo "Waiting for app..."
           sleep 5
         done
-        for i in {1..60}; do
+        if ! docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q app) | grep -q "running"; then
+          echo "App did not start in time"
+          exit 1
+        fi
+        for i in {1..30}; do
           if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q sqitch) | grep -q "running"; then
             echo "Sqitch is ready!"
             break
@@ -54,6 +62,10 @@ jobs:
           echo "Waiting for sqitch..."
           sleep 5
         done
+        if ! docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q sqitch) | grep -q "running"; then
+          echo "sqitch did not start in time"
+          exit 1
+        fi
         for i in {1..30}; do
           if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q pg_prove) | grep -q "running"; then
             echo "pg_prove is ready!"
@@ -62,6 +74,10 @@ jobs:
           echo "Waiting for pg_prove..."
           sleep 5
         done
+        if ! docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q pg_prove) | grep -q "running"; then
+          echo "pg_prove did not start in time"
+          exit 1
+        fi
 
     - name: Deploy Database with Sqitch (Initial Deploy)
       run: |
