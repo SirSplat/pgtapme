@@ -46,7 +46,7 @@ jobs:
           echo "Waiting for app..."
           sleep 5
         done
-        for i in {1..30}; do
+        for i in {1..60}; do
           if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q sqitch) | grep -q "running"; then
             echo "Sqitch is ready!"
             break
