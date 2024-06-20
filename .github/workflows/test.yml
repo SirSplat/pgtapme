@@ -1,0 +1,92 @@
+name: CI for pgtapme.py Development using Docker Compose
+
+on:
+  push:
+    branches:
+      - '**'  # Triggers on any branch
+  pull_request:
+    branches:
+      - '**'  # Triggers on pull requests to any branch
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+        fail-fast: true
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Set up Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
+
+    - name: Build and Start Docker Containers
+      run: |
+        docker-compose -f docker-compose.yml up -d --build
+
+    - name: Wait for Services to be Ready
+      run: |
+        for i in {1..30}; do
+          if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q db) | grep -q "running"; then
+            echo "Database is ready!"
+            break
+          fi
+          echo "Waiting for database..."
+          sleep 5
+        done
+        for i in {1..30}; do
+          if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q app) | grep -q "running"; then
+            echo "app is ready!"
+            break
+          fi
+          echo "Waiting for app..."
+          sleep 5
+        done
+        for i in {1..30}; do
+          if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q sqitch) | grep -q "running"; then
+            echo "Sqitch is ready!"
+            break
+          fi
+          echo "Waiting for sqitch..."
+          sleep 5
+        done
+        for i in {1..30}; do
+          if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q pg_prove) | grep -q "running"; then
+            echo "pg_prove is ready!"
+            break
+          fi
+          echo "Waiting for pg_prove..."
+          sleep 5
+        done
+
+    - name: Deploy Database with Sqitch (Initial Deploy)
+      run: |
+        docker-compose exec sqitch sqitch deploy --target dvdrental --chdir dvdrental
+
+    - name: Generate Database Tests with PGtapme (--db-name)
+      run: |
+        docker-compose exec app python /code/pgtapme.py --db-name dvdrental
+
+    - name: Run PGTap Tests with PgProve (dvdrental)
+      run: |
+        docker-compose exec pg_prove pg_prove -r --ext .sql -p 5432 -h db -U dbo -d dvdrental -f /mnt/tests/dvdrental > /mnt/tests/results/dvdrental.txt || exit 1
+
+    - name: Shutdown Docker Compose
+      if: always()
+      run: |
+        docker-compose -f docker-compose.yml down
+
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results
+        path: code/pgtapme_generated_files/results/

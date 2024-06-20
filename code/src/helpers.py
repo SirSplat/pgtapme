@@ -260,7 +260,7 @@ def connect_to_database():
         host=database_host,
         port=database_port,
     )
-    return conn
+    return conn, database_name
 
 
 @log_function_call()

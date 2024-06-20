@@ -28,15 +28,9 @@ def main() -> None:
     except Exception as e:
         logging.error(f"An unexpected error occurred: {e}", exc_info=True)
 
-    conn = connect_to_database()
+    conn, dbname = connect_to_database()
     cursor = conn.cursor(cursor_factory=extras.NamedTupleCursor)
-    output_file_db_name = os.getenv("DATABASE_NAME")
-
-    """
-    This creates the output_dir 'pgtapme_generated_files_{database_name}' in the directory where pgtapme.py is executed
-        from i.e. $(pwd)/pgtapme_generated_files_dvdrental
-    """
-    output_dir = os.path.join(config["output_dir"], output_file_db_name)
+    output_dir = os.path.join(config["output_dir"], dbname)
 
     logging.debug("Reverse engineer schema started.")
 
