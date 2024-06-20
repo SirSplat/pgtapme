@@ -26,7 +26,7 @@ jobs:
 
     - name: Build and Start Docker Containers
       run: |
-        docker-compose -f docker-compose.yml up --build
+        docker-compose up --build -d
         timeout-minutes: 10  # Timeout to ensure the step doesn't hang indefinitely
 
     - name: Print Docker Container Status and Logs
