@@ -23,10 +23,14 @@ services:
 
   sqitch:
     image: sqitch/sqitch
+    user: sqitch
     volumes:
       - ./sqitch/.sqitch/sqitch.conf:/home/.sqitch/sqitch.conf
       - ./sqitch/sqitch.sh:/home/sqitch.sh
-      - ./sqitch:/mnt/sqitch
+      - ./sqitch/dvdrental:/mnt/sqitch/dvdrental
+      - ./sqitch/pgtapme:/mnt/sqitch/pgtapme
+      - ./sqitch/sqitch.conf:/mnt/sqitch/sqitch.conf
+      - ./sqitch/.sqitch/.pgpass:/home/.pgpass
     working_dir: /mnt/sqitch
     entrypoint: /bin/bash
     command: -c "tail -f /home/sqitch.sh"
@@ -37,6 +41,7 @@ services:
     image: itheory/pg_prove
     volumes:
       - ./code/pgtapme_generated_files_dvdrental:/mnt/tests/dvdrental
+      - ./code/pgtapme_generated_files_pgtapme:/mnt/tests/pgtapme
       - ./pg_prove:/mnt/pg_prove
     environment:
       PGPASSWORD: mysecretpassword

@@ -1,0 +1,7 @@
+%syntax-version=1.0.0
+%project=pgtapme_dev
+%uri=https://github.com/SirSplat/pgtapme.git
+
+
+appschema 2024-06-19T13:29:39Z sqitch <sqitch@pgtapme.co.uk> # add pgtapme application test schema.
+appschema1 2024-06-20T08:37:06Z sqitch <sqitch@pgtapme.co.uk> # Add application schema1.

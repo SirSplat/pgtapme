@@ -16,5 +16,6 @@ RUN git clone https://github.com/theory/pgtap.git \
     && rm -rf pgtap
 
 COPY ./initdb.sh /docker-entrypoint-initdb.d/.
+COPY ./dvdrental ./dvdrental
 
 CMD ["postgres"]
