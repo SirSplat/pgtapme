@@ -32,7 +32,7 @@ services:
       - ./sqitch/sqitch.conf:/mnt/sqitch/sqitch.conf
       - ./sqitch/.sqitch/.pgpass:/home/.pgpass:ro
     working_dir: /mnt/sqitch
-    entrypoint: /bin/bash
+    entrypoint: /mnt/sqitch/entrypoint.sh
     command: -c "tail -f /home/sqitch.sh"
     depends_on:
       - db
