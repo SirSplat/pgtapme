@@ -65,7 +65,7 @@ jobs:
 
     - name: :Fix sqitch pgpass permissions
       run: |
-        docker-compose exec -T sqitch chmod 600 /home/.pgpass
+        docker-compose exec -T --user root sqitch chmod 600 /home/.pgpass
 
     - name: Deploy Database with Sqitch (Initial Deploy)
       run: |
