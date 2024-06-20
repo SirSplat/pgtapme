@@ -100,7 +100,7 @@ jobs:
 
     - name: Deploy Database with Sqitch (Initial Deploy)
       run: |
-        docker-compose exec -T sqitch env PGUSER=dbo PGPASSWORD=mysecretpassword sqitch deploy --target dvdrental --chdir dvdrental
+        docker-compose exec -T sqitch env PGUSER=dbo PGPASSWORD=mysecretpassword sqitch deploy --target dvdrental
 
     - name: Generate Database Tests with PGtapme (--db-name)
       run: |
