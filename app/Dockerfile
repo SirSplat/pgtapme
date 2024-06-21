@@ -13,14 +13,14 @@ RUN useradd -ms /bin/bash -u 1000 vscode \
 # Switch to the 'vscode' user
 USER vscode
 
-WORKDIR /code
-
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Ensure the vscode user owns the /code directory
-RUN chown -R vscode:vscode /code
+WORKDIR /code
 
 COPY ../ /code
+
+# Ensure the vscode user owns the /code directory
+RUN chmod 777 /code
 
 CMD ["tail", "-f", "/dev/null"]
