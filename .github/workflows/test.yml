@@ -104,7 +104,7 @@ jobs:
 
     - name: Generate Database Tests with PGtapme (--db-name)
       run: |
-        docker-compose exec -T --privileged app python /code/pgtapme.py --db-name dvdrental
+        sudo docker-compose exec -T --privileged app python /code/pgtapme.py --db-name dvdrental
 
     - name: Run PGTap Tests with PgProve (dvdrental)
       run: |
