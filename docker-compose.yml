@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./code:/code
+      - ./pgtapme_generated_files:/code/pgtapme_generated_files
     depends_on:
       - db
 

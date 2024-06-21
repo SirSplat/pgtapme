@@ -27,25 +27,23 @@ jobs:
     - name: Build and Start Docker Containers
       run: |
         docker-compose up --build -d
-      timeout-minutes: 10  # Timeout to ensure the step doesn't hang indefinitely
+      timeout-minutes: 10
 
     - name: Print Docker Container Status and Logs
       run: |
         echo "Docker container status:"
         docker ps -a
+        echo "Logs for all containers:"
+        docker-compose logs
 
-    - name: Print Sqitch Container Logs
+    - name: Ensure Generated Files Directory Exists and is Writable
       run: |
-        docker-compose logs sqitch
+        mkdir -p pgtapme_generated_files/dvdrental
+        chmod -R 777 pgtapme_generated_files
 
-    - name: Inspect Sqitch Container
+    - name: Set Permissions for Generated Files Directory
       run: |
-        docker inspect $(docker-compose ps -q sqitch)
-
-    - name: Print Sqitch Container Details
-      run: |
-        docker-compose ps -a
-        docker-compose logs sqitch
+        docker-compose exec -T app chmod -R 777 /code/pgtapme_generated_files
 
     - name: Wait for Database to be Ready
       run: |
@@ -61,6 +59,9 @@ jobs:
           echo "Database did not start in time"
           exit 1
         fi
+
+    - name: Wait for App to be Ready
+      run: |
         for i in {1..30}; do
           if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q app) | grep -q "running"; then
             echo "App is ready!"
@@ -73,6 +74,9 @@ jobs:
           echo "App did not start in time"
           exit 1
         fi
+
+    - name: Wait for Sqitch to be Ready
+      run: |
         for i in {1..30}; do
           if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q sqitch) | grep -q "running"; then
             echo "Sqitch is ready!"
@@ -85,6 +89,9 @@ jobs:
           echo "sqitch did not start in time"
           exit 1
         fi
+
+    - name: Wait for PGProve to be Ready
+      run: |
         for i in {1..30}; do
           if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q pg_prove) | grep -q "running"; then
             echo "pg_prove is ready!"
