@@ -6,35 +6,33 @@ on:
       - '**'  # Triggers on any branch
   pull_request:
     branches:
-      - '**'  # Triggers on pull requests to any branch
+      - main
 
 jobs:
-  test:
+  docker:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+    # - name: Set up Docker Buildx
+    #   uses: docker/setup-buildx-action@v1
 
-    - name: Set up Docker Compose
+    - name: Install docker-compose
       run: |
         sudo apt-get update
         sudo apt-get install -y docker-compose
 
-    - name: Build and Start Docker Containers
+    - name: Build and Start docker-compose Containers
       run: |
         docker-compose up --build -d
-      timeout-minutes: 10
 
     - name: Print Docker Container Status and Logs
       run: |
         echo "Docker container status:"
-        docker ps -a
-        echo "Logs for all containers:"
-        docker-compose logs
+        docker-compose ps -a
 
     # - name: Set Permissions for Generated Files Directory
     #   run: |
@@ -106,12 +104,11 @@ jobs:
 
     - name: Generate Database Tests with PGtapme (--db-name)
       run: |
-        docker-compose exec -T app bash ls -la /code
         docker-compose exec -T app python /code/pgtapme.py --db-name dvdrental
 
     - name: Run PGTap Tests with PgProve (dvdrental)
       run: |
-        docker-compose exec -T pg_prove pg_prove -r --ext .sql -p 5432 -h db -U dbo -d dvdrental -f /mnt/tests/dvdrental > /mnt/tests/results/dvdrental.txt || exit 1
+        docker-compose exec -T --privileged pg_prove pg_prove -r --ext .sql -p 5432 -h db -U dbo -d dvdrental -f /mnt/tests/dvdrental > /mnt/tests/results/dvdrental.txt || exit 1
 
     - name: Shutdown Docker Compose
       if: always()
