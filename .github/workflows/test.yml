@@ -110,6 +110,14 @@ jobs:
       run: |
         docker-compose exec -T pg_prove pg_prove -r --ext .sql -p 5432 -h db -U dbo -d dvdrental -f /mnt/tests/dvdrental
 
+    - name: Revert sqitch
+      run: |
+        docker-compose exec -T sqitch env PGUSER=dbo PGPASSWORD=mysecretpassword sqitch revert --target dvdrental -y
+
+    - name: Run PGTap Tests with PgProve (dvdrental)
+      run: |
+        docker-compose exec -T pg_prove pg_prove -r --ext .sql -p 5432 -h db -U dbo -d dvdrental -f /mnt/tests/dvdrental
+
     - name: Shutdown Docker Compose
       if: always()
       run: |
