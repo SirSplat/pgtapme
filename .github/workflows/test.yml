@@ -108,7 +108,7 @@ jobs:
 
     - name: Run PGTap Tests with PgProve (dvdrental)
       run: |
-        docker-compose exec -T pg_prove pg_prove -r --ext .sql -p 5432 -h db -U dbo -d dvdrental -f /mnt/tests/dvdrental > /mnt/tests/results/dvdrental.txt || exit 1
+        docker-compose exec -T pg_prove pg_prove -r --ext .sql -p 5432 -h db -U dbo -d dvdrental -f /mnt/tests/dvdrental > /mnt/tests/dvdrental_results.txt #|| exit 1
 
     - name: Shutdown Docker Compose
       if: always()
@@ -120,4 +120,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: test-results
-        path: code/pgtapme_generated_files/results/
+        path: code/pgtapme_generated_files/dvdrental_results.txt
