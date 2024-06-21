@@ -197,7 +197,7 @@ def log_function_call(func=None, log_level=logging.DEBUG, info_message=None):
 def create_file_path(output_dir, *parts):
     odir = os.path.join(output_dir, *parts[:-1])
     if not os.path.exists(odir):
-        os.makedirs(odir, mode=0o755, exist_ok=False)
+        os.makedirs(odir)
     return os.path.join(odir, f"{parts[-1]}.sql")
 
 

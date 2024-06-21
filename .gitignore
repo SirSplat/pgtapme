@@ -7,5 +7,4 @@ src/getters/__pycache__/
 *.pyd
 .vscode
 .pytest_cache
-pgtapme_generated_files_dvdrental
-pgtapme_generated_files_pgtapme
+pgtapme_generated_files
