@@ -18,6 +18,9 @@ WORKDIR /code
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Ensure the vscode user owns the /code directory
+RUN chown -R vscode:vscode /code
+
 COPY ../ /code
 
 CMD ["tail", "-f", "/dev/null"]
