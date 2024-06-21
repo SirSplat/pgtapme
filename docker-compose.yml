@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./code:/code
-    # user: vscode
+    user: vscode
     depends_on:
       - db
 
@@ -17,14 +17,15 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_DB: postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    # volumes:
+    #   - postgres_data:/var/lib/postgresql/data
+    user: postgres
     ports:
       - "5432:5432"
 
   sqitch:
     image: sqitch/sqitch
-    # user: sqitch
+    user: sqitch
     volumes:
       - ./sqitch/.sqitch/sqitch.conf:/home/.sqitch/sqitch.conf
       - ./sqitch/.sqitch/.pgpass:/home/.pgpass:ro
@@ -50,5 +51,5 @@ services:
     depends_on:
       - db
 
-volumes:
-  postgres_data:
+# volumes:
+#   postgres_data:
