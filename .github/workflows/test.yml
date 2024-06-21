@@ -10,10 +10,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Fix pgpass privileges
-      run: |
-        chmod 0600 sqitch/.sqitch/.pgpass
-
     - name: Install docker-compose
       run: |
         sudo apt-get update
@@ -53,8 +49,7 @@ jobs:
 
     - name: Deploy Database with Sqitch
       run: |
-        # docker-compose exec -T sqitch env PGUSER=dbo PGPASSWORD=mysecretpassword sqitch deploy --target dvdrental
-        docker-compose exec -T sqitch sqitch deploy --target dvdrental
+        docker-compose exec -T sqitch env PGUSER=dbo PGPASSWORD=mysecretpassword sqitch deploy --target dvdrental
 
     - name: Generate Database Tests with PGtapme (--db-name dvdrental)
       run: |

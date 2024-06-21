@@ -27,11 +27,11 @@ services:
     # user: sqitch
     volumes:
       - ./sqitch/.sqitch/sqitch.conf:/home/.sqitch/sqitch.conf
+      - ./sqitch/.sqitch/.pgpass:/home/.pgpass:ro
       - ./sqitch/sqitch.sh:/home/sqitch.sh
+      - ./sqitch/sqitch.conf:/mnt/sqitch/sqitch.conf
       - ./sqitch/dvdrental:/mnt/sqitch/dvdrental
       - ./sqitch/pgtapme:/mnt/sqitch/pgtapme
-      - ./sqitch/sqitch.conf:/mnt/sqitch/sqitch.conf
-      - ./sqitch/.sqitch/.pgpass:/home/.pgpass:ro
     working_dir: /mnt/sqitch
     entrypoint: /bin/bash
     command: -c "tail -f /dev/null"
