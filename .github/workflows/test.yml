@@ -104,11 +104,11 @@ jobs:
 
     - name: Generate Database Tests with PGtapme (--db-name)
       run: |
-        docker-compose exec -T -u root --privileged app python /code/pgtapme.py --db-name dvdrental
+        docker-compose exec -T -u vscode app python /code/pgtapme.py --db-name dvdrental
 
     - name: Run PGTap Tests with PgProve (dvdrental)
       run: |
-        docker-compose exec -T --privileged pg_prove pg_prove -r --ext .sql -p 5432 -h db -U dbo -d dvdrental -f /mnt/tests/dvdrental > /mnt/tests/results/dvdrental.txt || exit 1
+        docker-compose exec -T pg_prove pg_prove -r --ext .sql -p 5432 -h db -U dbo -d dvdrental -f /mnt/tests/dvdrental > /mnt/tests/results/dvdrental.txt || exit 1
 
     - name: Shutdown Docker Compose
       if: always()
