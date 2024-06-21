@@ -100,7 +100,7 @@ jobs:
 
     - name: Deploy Database with Sqitch (Initial Deploy)
       run: |
-        docker-compose exec -T sqitch env PGUSER=dbo PGPASSWORD=mysecretpassword sqitch deploy --target dvdrental
+        docker-compose exec -T sqitch env PGUSER=dbo PGPASSWORD=mysecretpassword sqitch deploy --to @v0.1-relations --target dvdrental
 
     - name: Generate Database Tests with PGtapme (--db-name)
       run: |
@@ -108,7 +108,7 @@ jobs:
 
     - name: Run PGTap Tests with PgProve (dvdrental)
       run: |
-        docker-compose exec -T pg_prove pg_prove -r --ext .sql -p 5432 -h db -U dbo -d dvdrental -f /mnt/tests/dvdrental #> /mnt/tests/dvdrental_results.txt #|| exit 1
+        docker-compose exec -T pg_prove pg_prove -r --ext .sql -p 5432 -h db -U dbo -d dvdrental -f /mnt/tests/dvdrental
 
     - name: Shutdown Docker Compose
       if: always()
