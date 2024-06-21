@@ -11,7 +11,7 @@ RUN useradd -ms /bin/bash -u 1000 vscode \
     && echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Switch to the 'vscode' user
-USER root
+# USER root
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
