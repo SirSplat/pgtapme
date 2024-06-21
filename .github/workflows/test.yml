@@ -38,7 +38,7 @@ jobs:
 
     - name: Set Permissions for Generated Files Directory
       run: |
-        docker-compose exec -T app chmod -R 777 /code
+        docker-compose exec -T app chmod -R 777 /code/pgtapme_generated_files
 
     - name: Wait for Database to be Ready
       run: |
