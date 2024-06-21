@@ -36,14 +36,9 @@ jobs:
         echo "Logs for all containers:"
         docker-compose logs
 
-    - name: Ensure Generated Files Directory Exists and is Writable
-      run: |
-        mkdir -p pgtapme_generated_files/dvdrental
-        chmod -R 777 pgtapme_generated_files
-
     - name: Set Permissions for Generated Files Directory
       run: |
-        docker-compose exec -T app chmod -R 777 /code/pgtapme_generated_files
+        docker-compose exec -T app chmod -R 777 /code
 
     - name: Wait for Database to be Ready
       run: |
