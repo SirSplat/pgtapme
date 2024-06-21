@@ -31,7 +31,9 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
         set_plan_count(file_path)
 
 
-def write_tests(f: TextIOWrapper, cursor: TextIO, database_name: str, owner_is: str) -> None:
+def write_tests(
+    f: TextIOWrapper, cursor: TextIO, database_name: str, owner_is: str
+) -> None:
     write_tests_header(f)
 
     write_has_role(f, owner_is)

@@ -20,7 +20,4 @@ WORKDIR /code
 
 COPY ../ /code
 
-# Ensure the vscode user owns the /code directory
-RUN chmod 777 /code
-
 CMD ["tail", "-f", "/dev/null"]
