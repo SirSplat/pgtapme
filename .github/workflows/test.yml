@@ -1,13 +1,6 @@
 name: CI for pgtapme.py Development using Docker Compose
 
-on:
-  push:
-    branches:
-      - '**'  # Triggers on any branch
-  pull_request:
-    branches:
-      - main
-
+on: [push]
 jobs:
   docker:
     timeout-minutes: 10
@@ -17,8 +10,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    # - name: Set up Docker Buildx
-    #   uses: docker/setup-buildx-action@v1
+    - name: Fix pgpass privileges
+      run: |
+        chmod 0600 sqitch/.sqitch/.pgpass
 
     - name: Install docker-compose
       run: |
@@ -29,80 +23,40 @@ jobs:
       run: |
         docker-compose up --build -d
 
-    - name: Print Docker Container Status and Logs
+    - name: Check Database is Ready
       run: |
-        echo "Docker container status:"
-        docker-compose ps -a
-
-    # - name: Set Permissions for Generated Files Directory
-    #   run: |
-    #     docker-compose exec -T app chmod -R 777 /code/pgtapme_generated_files
-
-    - name: Wait for Database to be Ready
-      run: |
-        for i in {1..30}; do
-          if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q db) | grep -q "running"; then
-            echo "Database is ready!"
-            break
-          fi
-          echo "Waiting for database..."
-          sleep 5
-        done
         if ! docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q db) | grep -q "running"; then
-          echo "Database did not start in time"
+          echo "Database is not ready"
           exit 1
         fi
 
-    - name: Wait for App to be Ready
+    - name: Check App is Ready
       run: |
-        for i in {1..30}; do
-          if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q app) | grep -q "running"; then
-            echo "App is ready!"
-            break
-          fi
-          echo "Waiting for app..."
-          sleep 5
-        done
         if ! docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q app) | grep -q "running"; then
-          echo "App did not start in time"
+          echo "App is not ready"
           exit 1
         fi
 
-    - name: Wait for Sqitch to be Ready
+    - name: Check Sqitch is Ready
       run: |
-        for i in {1..30}; do
-          if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q sqitch) | grep -q "running"; then
-            echo "Sqitch is ready!"
-            break
-          fi
-          echo "Waiting for sqitch..."
-          sleep 5
-        done
         if ! docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q sqitch) | grep -q "running"; then
-          echo "sqitch did not start in time"
+          echo "Sqitch is not ready"
           exit 1
         fi
 
-    - name: Wait for PGProve to be Ready
+    - name: Check Pg_prove is Ready
       run: |
-        for i in {1..30}; do
-          if docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q pg_prove) | grep -q "running"; then
-            echo "pg_prove is ready!"
-            break
-          fi
-          echo "Waiting for pg_prove..."
-          sleep 5
-        done
         if ! docker inspect --format='{{json .State.Status}}' $(docker-compose ps -q pg_prove) | grep -q "running"; then
-          echo "pg_prove did not start in time"
+          echo "Pg_prove is not ready"
           exit 1
         fi
 
-    - name: Deploy Database with Sqitch (Initial Deploy)
+    - name: Deploy Database with Sqitch
       run: |
-        docker-compose exec -T sqitch env PGUSER=dbo PGPASSWORD=mysecretpassword sqitch deploy --to @v0.1-relations --target dvdrental
+        # docker-compose exec -T sqitch env PGUSER=dbo PGPASSWORD=mysecretpassword sqitch deploy --target dvdrental
+        docker-compose exec -T sqitch sqitch deploy --target dvdrental
 
-    - name: Generate Database Tests with PGtapme (--db-name)
+    - name: Generate Database Tests with PGtapme (--db-name dvdrental)
       run: |
         docker-compose exec -T app python /code/pgtapme.py --db-name dvdrental
 
@@ -110,13 +64,17 @@ jobs:
       run: |
         docker-compose exec -T pg_prove pg_prove -r --ext .sql -p 5432 -h db -U dbo -d dvdrental -f /mnt/tests/dvdrental
 
-    - name: Revert sqitch
+    - name: Verify Database with Sqitch
+      run: |
+        docker-compose exec -T sqitch env PGUSER=dbo PGPASSWORD=mysecretpassword sqitch verify --target dvdrental
+
+    - name: Revert Database with Sqitch
       run: |
         docker-compose exec -T sqitch env PGUSER=dbo PGPASSWORD=mysecretpassword sqitch revert --target dvdrental -y
 
-    - name: Run PGTap Tests with PgProve (dvdrental)
-      run: |
-        docker-compose exec -T pg_prove pg_prove -r --ext .sql -p 5432 -h db -U dbo -d dvdrental -f /mnt/tests/dvdrental
+    # - name: Run PGTap Tests with PgProve (dvdrental)
+    #   run: |
+    #     docker-compose exec -T pg_prove pg_prove -r --ext .sql -p 5432 -h db -U dbo -d dvdrental -f /mnt/tests/dvdrental
 
     - name: Shutdown Docker Compose
       if: always()
