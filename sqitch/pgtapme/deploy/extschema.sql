@@ -1,8 +1,8 @@
--- Deploy pgtapme_dev:appschema to pg
+-- Deploy pgtapme_dev:extschema to pg
 
 BEGIN;
 
-CREATE SCHEMA pgtapme;
+CREATE SCHEMA pgtapme_ext;
 
 ALTER DEFAULT PRIVILEGES
     IN SCHEMA pgtapme

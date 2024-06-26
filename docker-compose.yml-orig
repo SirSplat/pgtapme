@@ -3,15 +3,11 @@ services:
     build:
       context: ./app
       dockerfile: Dockerfile
-      target: development # Use the 'development' stage from the Dockerfile for devcontainer setup
     volumes:
-      - ./code:/home/vscode/code # Mount the code directory for immediate updates in development
+      - ./code:/code
     user: vscode
-    environment:
-      - PYTHONUNBUFFERED=1 # Ensure the output is not buffered, useful for logging
     depends_on:
       - db
-    command: [ "tail", "-f", "/dev/null" ] # Keeps the container running for devcontainer usage
 
   db:
     build:
@@ -22,7 +18,7 @@ services:
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_DB: postgres
     # volumes:
-    #   - postgres_data:/var/lib/postgresql/data  # Uncomment this for persistent storage
+    #   - postgres_data:/var/lib/postgresql/data
     user: postgres
     ports:
       - "5432:5432"
@@ -46,8 +42,8 @@ services:
   pg_prove:
     image: itheory/pg_prove
     volumes:
-      - ./code/pgtapme_generated_files:/mnt/tests
-      - ./pg_prove:/mnt/pg_prove
+      - ./code/pgtapme_generated_files:/mnt/tests:rw
+      - ./pg_prove:/mnt/pg_prove:rw
     environment:
       PGPASSWORD: mysecretpassword
     entrypoint: /bin/sh

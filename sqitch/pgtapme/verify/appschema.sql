@@ -2,6 +2,6 @@
 
 BEGIN;
 
-SELECT pg_catalog.has_schema_privileges( CURRENT_USER, 'pgtapme', 'usage' );
+SELECT pg_catalog.has_schema_privilege( CURRENT_USER, 'pgtapme', 'USAGE' );
 
 ROLLBACK;
