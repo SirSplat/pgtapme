@@ -10,22 +10,59 @@ services:
     environment:
       - PYTHONUNBUFFERED=1 # Ensure the output is not buffered, useful for logging
     depends_on:
-      - db
+      - manager_db
+      - pgtapme_db
+      - dvdrental_db
+      - dvdrental_alt_db
     command: [ "tail", "-f", "/dev/null" ] # Keeps the container running for devcontainer usage
 
-  db:
+  manager_db:
     build:
-      context: ./db
+      context: ./db/manager
       dockerfile: Dockerfile
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_DB: postgres
-    # volumes:
-    #   - postgres_data:/var/lib/postgresql/data  # Uncomment this for persistent storage
+    user: postgres
+    ports:
+      - "5431:5432"
+
+  pgtapme_db:
+    build:
+      context: ./db/pgtapme
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: postgres
     user: postgres
     ports:
       - "5432:5432"
+
+  dvdrental_alt_db:
+    build:
+      context: ./db/dvdrental_alt
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: postgres
+    user: postgres
+    ports:
+      - "5433:5432"
+
+  dvdrental_db:
+    build:
+      context: ./db/dvdrental
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: postgres
+    user: postgres
+    ports:
+      - "5434:5432"
 
   sqitch:
     image: sqitch/sqitch
@@ -41,7 +78,10 @@ services:
     entrypoint: /bin/bash
     command: -c "tail -f /dev/null"
     depends_on:
-      - db
+      - manager_db
+      - pgtapme_db
+      - dvdrental_db
+      - dvdrental_alt_db
 
   pg_prove:
     image: itheory/pg_prove
@@ -53,7 +93,7 @@ services:
     entrypoint: /bin/sh
     command: -c "tail -f /dev/null"
     depends_on:
-      - db
-
-# volumes:
-#   postgres_data:
+      - manager_db
+      - pgtapme_db
+      - dvdrental_db
+      - dvdrental_alt_db
