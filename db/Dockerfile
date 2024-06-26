@@ -18,21 +18,21 @@ RUN git clone https://github.com/theory/pgtap.git \
     && cd .. \
     && rm -rf pgtap
 
-# Clone, build, and install pg_partman from GitHub
-RUN git clone https://github.com/pgpartman/pg_partman.git \
-    && cd pg_partman \
-    && make CC=gcc \
-    && make install \
-    && cd .. \
-    && rm -rf pg_partman
+# # Clone, build, and install pg_partman from GitHub
+# RUN git clone https://github.com/pgpartman/pg_partman.git \
+#     && cd pg_partman \
+#     && make CC=gcc \
+#     && make install \
+#     && cd .. \
+#     && rm -rf pg_partman
 
-# Download, build, and install pg_cron from GitHub
-RUN git clone https://github.com/citusdata/pg_cron.git \
-    && cd pg_cron \
-    && make \
-    && make install \
-    && cd .. \
-    && rm -rf pg_cron
+# # Download, build, and install pg_cron from GitHub
+# RUN git clone https://github.com/citusdata/pg_cron.git \
+#     && cd pg_cron \
+#     && make \
+#     && make install \
+#     && cd .. \
+#     && rm -rf pg_cron
 
 # Stage 2: Final stage
 FROM postgres:16-alpine
@@ -42,12 +42,12 @@ COPY --from=build /usr/local/lib/postgresql /usr/local/lib/postgresql
 COPY --from=build /usr/local/share/postgresql/extension /usr/local/share/postgresql/extension
 COPY --from=build /usr/local/bin/pg_prove /usr/local/bin/pg_prove
 
-# Add configuration for pg_cron and pg_partman in the PostgreSQL config
-RUN echo "shared_preload_libraries = 'pg_partman_bgw, pg_cron'" >> /usr/local/share/postgresql/postgresql.conf.sample \
-    && echo "cron.database_name = 'manager'" >> /usr/local/share/postgresql/postgresql.conf.sample \
-    && echo "pg_partman_bgw.role = 'dbo'" >> /usr/local/share/postgresql/postgresql.conf.sample \
-    && echo "pg_partman_bgw.interval = 3600" >> /usr/local/share/postgresql/postgresql.conf.sample \
-    && echo "pg_partman_bgw.dbname = 'pgtapme'" >> /usr/local/share/postgresql/postgresql.conf.sample
+# # Add configuration for pg_cron and pg_partman in the PostgreSQL config
+# RUN echo "shared_preload_libraries = 'pg_partman_bgw, pg_cron'" >> /usr/local/share/postgresql/postgresql.conf.sample \
+#     && echo "cron.database_name = 'manager'" >> /usr/local/share/postgresql/postgresql.conf.sample \
+#     && echo "pg_partman_bgw.role = 'dbo'" >> /usr/local/share/postgresql/postgresql.conf.sample \
+#     && echo "pg_partman_bgw.interval = 3600" >> /usr/local/share/postgresql/postgresql.conf.sample \
+#     && echo "pg_partman_bgw.dbname = 'pgtapme'" >> /usr/local/share/postgresql/postgresql.conf.sample
 
 # Set the working directory
 WORKDIR /code
