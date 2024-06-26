@@ -3,14 +3,19 @@
 %uri=https://github.com/SirSplat/pgtapme.git
 
 appschema 2024-06-24T17:01:17Z sqitch <sqitch@pgtapme.co.uk> # Add application schema.
-appschema_comment [appschema] 2024-06-24T17:11:15Z sqitch <sqitch@pgtapme.co.uk> # Add application schema description.
+comments/appschema [appschema] 2024-06-24T17:11:15Z sqitch <sqitch@pgtapme.co.uk> # Add application schema description.
 extschema 2024-06-24T17:46:07Z sqitch <sqitch@pgtapme.co.uk> # Add application extension schema.
-extschema_comment [extschema] 2024-06-24T17:49:41Z sqitch <sqitch@pgtapme.co.uk> # Add application extension schema description.
+comments/extschema [extschema] 2024-06-24T17:49:41Z sqitch <sqitch@pgtapme.co.uk> # Add application extension schema description.
 gist_ext [extschema] 2024-06-24T17:52:57Z sqitch <sqitch@pgtapme.co.uk> # Add gist extension.
+comments/gist_ext [extschema gist_ext] 2024-06-26T11:18:27Z sqitch <sqitch@pgtapme.co.uk> # Used in the date_range_gist function.
 tables/lkp_dow [appschema] 2024-06-25T07:39:12Z sqitch <sqitch@pgtapme.co.uk> # Add Day of Week Lookup table.
+comments/lkp_dow [appschema tables/lkp_dow] 2024-06-26T10:10:11Z sqitch <sqitch@pgtapme.co.uk> # Add relation comment.
 functions/lkp_dow_populate-date-date [appschema tables/lkp_dow] 2024-06-25T07:44:01Z sqitch <sqitch@pgtapme.co.uk> # Populate Day of Week Lookup table (pgtapme.lkp_dow)
+comments/lkp_dow_populate-date-date [appschema functions/lkp_dow_populate-date-date] 2024-06-26T12:09:25Z sqitch <sqitch@pgtapme.co.uk> # Create pgtapme.lkp_dow_populate(date, date) function which populates the pgtapme.lkp_dow table.
 tables/lkp_mth [appschema] 2024-06-25T09:19:14Z sqitch <sqitch@pgtapme.co.uk> # Add Month Lookup table.
+comments/lkp_mth [appschema tables/lkp_mth] 2024-06-26T12:57:57Z sqitch <sqitch@pgtapme.co.uk> # Add pgtapme.lkp_mth comment.
 functions/lkp_mth_populate-date-date [appschema tables/lkp_mth] 2024-06-25T09:23:16Z sqitch <sqitch@pgtapme.co.uk> # Populate Month Lookup table (pgtapme.lkp_mth)
+comments/lkp_mth_populate-date-date [appschema functions/lkp_mth_populate-date-date] 2024-06-26T13:01:20Z sqitch <sqitch@pgtapme.co.uk> # Create pgtapme.lkp_mth_populate(date, date) function which populates the pgtapme.lkp_mth table.
 functions/date_range_gist-date-date [appschema gist_ext] 2024-06-25T10:40:43Z sqitch <sqitch@pgtapme.co.uk> # Add pgtapme.date_range(date, date) function to be used by gist indexes.
 data/lkp_dow_populate [appschema tables/lkp_dow functions/lkp_dow_populate-date-date] 2024-06-25T12:11:17Z sqitch <sqitch@pgtapme.co.uk> # Populate pgtapme.lkp_dow table.
 data/lkp_mth_populate [appschema tables/lkp_mth functions/lkp_mth_populate-date-date] 2024-06-25T14:08:52Z sqitch <sqitch@pgtapme.co.uk> # Populate pgtapme.lkp_mth table.
