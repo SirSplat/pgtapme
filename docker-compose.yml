@@ -72,8 +72,7 @@ services:
       - ./sqitch/.sqitch/.pgpass:/home/.pgpass:ro
       - ./sqitch/sqitch.sh:/home/sqitch.sh
       - ./sqitch/sqitch.conf:/mnt/sqitch/sqitch.conf
-      - ./sqitch/dvdrental:/mnt/sqitch/dvdrental
-      - ./sqitch/pgtapme:/mnt/sqitch/pgtapme
+      - ./sqitch/projects/:/mnt/sqitch/
     working_dir: /mnt/sqitch
     entrypoint: /bin/bash
     command: -c "tail -f /dev/null"
@@ -87,7 +86,8 @@ services:
     image: itheory/pg_prove
     volumes:
       - ./code/pgtapme_generated_files:/mnt/tests
-      - ./pg_prove:/mnt/pg_prove
+      - ./pg_prove/pg_prove.sh:/mnt/pg_prove/pg_prove.sh
+      - ./pg_prove/projects/:/mnt/tests/
     environment:
       PGPASSWORD: mysecretpassword
     entrypoint: /bin/sh
