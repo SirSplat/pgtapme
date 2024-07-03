@@ -6,34 +6,47 @@ from src.helpers import log_function_call, validate_kinds
 
 @log_function_call
 def get_tablespaces_are(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get tablespaces.")
     cursor.execute(
         """
         SELECT
             ARRAY_AGG( spcname ) AS tablespaces_are
         FROM
             pg_catalog.pg_tablespace
-    """
+        """
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No tablespaces found.")
+        return []
+    logging.debug(f"Tablespaces returned: {records.tablespaces_are}")
     return records.tablespaces_are
 
 
 @log_function_call
 def get_roles_are(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get roles.")
     cursor.execute(
         """
         SELECT
             ARRAY_AGG( rolname ) AS roles_are
         FROM
             pg_catalog.pg_roles
-    """
+        """
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No roles found.")
+        return []
+    logging.debug(f"Roles returned: {records.roles_are}")
     return records.roles_are
 
 
 @log_function_call
 def get_groups_are(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get groups.")
     cursor.execute(
         """
         SELECT
@@ -42,14 +55,20 @@ def get_groups_are(cursor: TextIO) -> List[str]:
             pg_catalog.pg_roles
         WHERE
             NOT rolcanlogin
-    """
+        """
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No groups found.")
+        return []
+    logging.debug(f"Groups returned: {records.groups_are}")
     return records.groups_are
 
 
 @log_function_call
 def get_users_are(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get users.")
     cursor.execute(
         """
         SELECT
@@ -58,14 +77,20 @@ def get_users_are(cursor: TextIO) -> List[str]:
             pg_catalog.pg_roles
         WHERE
             rolcanlogin
-    """
+        """
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No users found.")
+        return []
+    logging.debug(f"Users returned: {records.users_are}")
     return records.users_are
 
 
 @log_function_call
 def get_languages_are(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get languages.")
     cursor.execute(
         """
         SELECT
@@ -74,14 +99,20 @@ def get_languages_are(cursor: TextIO) -> List[str]:
             pg_catalog.pg_language
         WHERE
             lanispl
-    """
+        """
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No languages found.")
+        return []
+    logging.debug(f"Languages returned: {records.languages_are}")
     return records.languages_are
 
 
 @log_function_call
 def get_casts_are(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get casts.")
     cursor.execute(
         """
         SELECT
@@ -91,14 +122,20 @@ def get_casts_are(cursor: TextIO) -> List[str]:
             ) AS casts_are
         FROM
             pg_catalog.pg_cast
-    """
+        """
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No casts found.")
+        return []
+    logging.debug(f"Casts returned: {records.casts_are}")
     return records.casts_are
 
 
 @log_function_call
 def get_extensions_are(cursor: TextIO, schema_name: str) -> List[str]:
+    logging.debug(f"Executing query to get extensions for schema: {schema_name}")
     cursor.execute(
         """
         SELECT
@@ -109,10 +146,15 @@ def get_extensions_are(cursor: TextIO, schema_name: str) -> List[str]:
         WHERE
             pg_namespace.nspname = %s OR
             %s = ''
-    """,
+        """,
         (schema_name, schema_name),
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No extensions found.")
+        return []
+    logging.debug(f"Extensions returned: {records.extensions_are}")
     return records.extensions_are
 
 
@@ -120,7 +162,13 @@ def get_extensions_are(cursor: TextIO, schema_name: str) -> List[str]:
 def get_relations_are(
     cursor: TextIO, schema_name: str, kinds: List[str] = None
 ) -> List[str]:
+    logging.debug(
+        f"Validating kinds for relations in schema: {schema_name}, kinds: {kinds}"
+    )
     validate_kinds("pg_class", kinds)
+    logging.debug(
+        f"Executing query to get relations for schema: {schema_name}, kinds: {kinds}"
+    )
     cursor.execute(
         """
         SELECT
@@ -133,40 +181,61 @@ def get_relations_are(
             )
         WHERE
             c.relkind = ANY( %s )
-    """,
-        (schema_name, [kinds]),
+        """,
+        (schema_name, kinds),
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No relations found.")
+        return []
+    logging.debug(f"Relations returned: {records.relations_are}")
     return records.relations_are
 
 
 @log_function_call
 def get_tables_are(cursor: TextIO, schema_name: str) -> List[str]:
-    return get_relations_are(cursor, schema_name, ["p", "r"])
+    logging.debug(f"Getting tables for schema: {schema_name}")
+    result = get_relations_are(cursor, schema_name, ["p", "r"])
+    logging.debug(f"Tables fetched successfully for schema: {schema_name}")
+    return result
 
 
 @log_function_call
 def get_foreign_tables_are(cursor: TextIO, schema_name: str) -> List[str]:
-    return get_relations_are(cursor, schema_name, ["f"])
+    logging.debug(f"Getting foreign tables for schema: {schema_name}")
+    result = get_relations_are(cursor, schema_name, ["f"])
+    logging.debug(f"Foreign tables fetched successfully for schema: {schema_name}")
+    return result
 
 
 @log_function_call
 def get_views_are(cursor: TextIO, schema_name: str) -> List[str]:
-    return get_relations_are(cursor, schema_name, ["v"])
+    logging.debug(f"Getting views for schema: {schema_name}")
+    result = get_relations_are(cursor, schema_name, ["v"])
+    logging.debug(f"Views fetched successfully for schema: {schema_name}")
+    return result
 
 
 @log_function_call
 def get_materialized_views_are(cursor: TextIO, schema_name: str) -> List[str]:
-    return get_relations_are(cursor, schema_name, ["m"])
+    logging.debug(f"Getting materialized views for schema: {schema_name}")
+    result = get_relations_are(cursor, schema_name, ["m"])
+    logging.debug(f"Materialized views fetched successfully for schema: {schema_name}")
+    return result
 
 
 @log_function_call
 def get_sequences_are(cursor: TextIO, schema_name: str) -> List[str]:
-    return get_relations_are(cursor, schema_name, ["S"])
+    logging.debug(f"Getting sequences for schema: {schema_name}")
+    result = get_relations_are(cursor, schema_name, ["S"])
+    logging.debug(f"Sequences fetched successfully for schema: {schema_name}")
+    return result
 
 
 @log_function_call
 def get_schemas_are(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get schemas.")
     cursor.execute(
         """
         SELECT
@@ -176,14 +245,20 @@ def get_schemas_are(cursor: TextIO) -> List[str]:
         WHERE
             pg_namespace.nspname NOT IN ( 'information_schema', 'pg_catalog' ) AND
             pg_namespace.nspname NOT ILIKE 'pg_t%'
-    """
+        """
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No schemas found.")
+        return []
+    logging.debug(f"Schemas returned: {records.schemas_are}")
     return records.schemas_are
 
 
 @log_function_call
 def get_functions_are(cursor: TextIO, schema_name: str) -> List[str]:
+    logging.debug(f"Executing query to get functions for schema: {schema_name}")
     cursor.execute(
         """
         SELECT
@@ -194,15 +269,21 @@ def get_functions_are(cursor: TextIO, schema_name: str) -> List[str]:
                 n.oid = p.pronamespace AND
                 n.nspname = %s
             )
-    """,
+        """,
         (schema_name,),
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No functions found for schema: {schema_name}")
+        return []
+    logging.debug(f"Functions returned: {records.functions_are}")
     return records.functions_are
 
 
 @log_function_call
 def get_opclasses_are(cursor: TextIO, schema_name: str) -> List[str]:
+    logging.debug(f"Executing query to get operator classes for schema: {schema_name}")
     cursor.execute(
         """
         SELECT
@@ -213,15 +294,21 @@ def get_opclasses_are(cursor: TextIO, schema_name: str) -> List[str]:
                 n.oid = p.opcnamespace AND
                 n.nspname = %s
             )
-    """,
+        """,
         (schema_name,),
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No operator classes found for schema: {schema_name}")
+        return []
+    logging.debug(f"Operator classes returned: {records.opclasses_are}")
     return records.opclasses_are
 
 
 @log_function_call
 def get_types_are(cursor: TextIO, schema_name: str) -> List[str]:
+    logging.debug(f"Executing query to get types for schema: {schema_name}")
     cursor.execute(
         """
         SELECT
@@ -241,15 +328,21 @@ def get_types_are(cursor: TextIO, schema_name: str) -> List[str]:
                     SELECT 1 FROM pg_catalog.pg_type el WHERE el.oid = pg_type.typelem AND el.typarray = pg_type.oid
             ) AND
                 pg_namespace.nspname = %s
-    """,
+        """,
         (schema_name,),
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No types found for schema: {schema_name}")
+        return []
+    logging.debug(f"Types returned: {records.types_are}")
     return records.types_are
 
 
 @log_function_call
 def get_domains_are(cursor: TextIO, schema_name: str) -> List[str]:
+    logging.debug(f"Executing query to get domains for schema: {schema_name}")
     cursor.execute(
         """
         SELECT
@@ -262,15 +355,21 @@ def get_domains_are(cursor: TextIO, schema_name: str) -> List[str]:
             )
         WHERE
             t.typtype = 'd'
-    """,
+        """,
         (schema_name,),
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No domains found for schema: {schema_name}")
+        return []
+    logging.debug(f"Domains returned: {records.domains_are}")
     return records.domains_are
 
 
 @log_function_call
 def get_enums_are(cursor: TextIO, schema_name: str) -> List[str]:
+    logging.debug(f"Executing query to get enums for schema: {schema_name}")
     cursor.execute(
         """
         SELECT
@@ -283,15 +382,21 @@ def get_enums_are(cursor: TextIO, schema_name: str) -> List[str]:
             )
         WHERE
             t.typtype = 'e'
-    """,
+        """,
         (schema_name,),
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No enums found for schema: {schema_name}")
+        return []
+    logging.debug(f"Enums returned: {records.enums_are}")
     return records.enums_are
 
 
 @log_function_call
 def get_operators_are(cursor: TextIO, schema_name: str) -> List[str]:
+    logging.debug(f"Executing query to get operators for schema: {schema_name}")
     cursor.execute(
         """
         SELECT
@@ -306,10 +411,15 @@ def get_operators_are(cursor: TextIO, schema_name: str) -> List[str]:
             JOIN pg_catalog.pg_namespace n ON o.oprnamespace = n.oid
         WHERE
             n.nspname = %s
-    """,
+        """,
         (schema_name,),
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No operators found for schema: {schema_name}")
+        return []
+    logging.debug(f"Operators returned: {records.operators_are}")
     return records.operators_are
 
 
@@ -317,28 +427,41 @@ def get_operators_are(cursor: TextIO, schema_name: str) -> List[str]:
 def get_partitions_are(
     cursor: TextIO, schema_name: str, table_name: str, kind: str = "p"
 ) -> List[str]:
+    logging.debug(
+        f"Executing query to get partitions for schema: {schema_name}, table: {table_name}, kind: {kind}"
+    )
     cursor.execute(
         """
         SELECT
             ARRAY_AGG( n.nspname || '.' || c2.relname ) AS partitions_are
         FROM
             pg_class c1
-            JOIN pg_catalog.pg_inherits i ON ( i.inhparent = c1.oid )
+            JOIN pg_catalog.pg_inherits I ON ( i.inhparent = c1.oid )
             JOIN pg_class c2 ON ( c2.oid = i.inhrelid )
             JOIN pg_namespace n ON ( n.oid = c1.relnamespace )
         WHERE
             c1.relkind = %s AND
             n.nspname = %s AND
             c1.relname = %s
-    """,
+        """,
         (kind, schema_name, table_name),
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(
+            f"No partitions found for schema: {schema_name}, table: {table_name}"
+        )
+        return []
+    logging.debug(f"Partitions returned: {records.partitions_are}")
     return records.partitions_are
 
 
 @log_function_call
 def get_columns_are(cursor: TextIO, schema_name: str, table_name: str) -> List[str]:
+    logging.debug(
+        f"Executing query to get columns for schema: {schema_name}, table: {table_name}"
+    )
     cursor.execute(
         """
         SELECT
@@ -358,15 +481,25 @@ def get_columns_are(cursor: TextIO, schema_name: str, table_name: str) -> List[s
             c.relname = %s AND
             attnum > 0 AND
             NOT a.attisdropped
-    """,
+        """,
         (schema_name, table_name),
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(
+            f"No columns found for schema: {schema_name}, table: {table_name}"
+        )
+        return []
+    logging.debug(f"Columns returned: {records.columns_are}")
     return records.columns_are
 
 
 @log_function_call
 def get_indexes_are(cursor: TextIO, schema_name: str, table_name: str) -> List[str]:
+    logging.debug(
+        f"Executing query to get indexes for schema: {schema_name}, table: {table_name}"
+    )
     cursor.execute(
         """
         SELECT
@@ -376,15 +509,25 @@ def get_indexes_are(cursor: TextIO, schema_name: str, table_name: str) -> List[s
         WHERE
             schemaname = %s AND
             tablename = %s
-    """,
+        """,
         (schema_name, table_name),
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(
+            f"No indexes found for schema: {schema_name}, table: {table_name}"
+        )
+        return []
+    logging.debug(f"Indexes returned: {records.indexes_are}")
     return records.indexes_are
 
 
 @log_function_call
 def get_triggers_are(cursor: TextIO, schema_name: str, table_name: str) -> List[str]:
+    logging.debug(
+        f"Executing query to get triggers for schema: {schema_name}, table: {table_name}"
+    )
     cursor.execute(
         """
         SELECT
@@ -398,15 +541,26 @@ def get_triggers_are(cursor: TextIO, schema_name: str, table_name: str) -> List[
             pg_class.relname = %s AND
             pg_class.relhastriggers AND
             NOT pg_trigger.tgisinternal
-    """,
+        """,
         (schema_name, table_name),
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(
+            f"No triggers found for schema: {schema_name}, table: {table_name}"
+        )
+        return []
+    logging.debug(f"Triggers returned: {records.triggers_are}")
     return records.triggers_are
 
 
 @log_function_call
 def get_rules_are(cursor: TextIO, schema_name: str, table_name: str) -> List[str]:
+    logging.debug(
+        f"Executing query to get rules for shema: {schema_name}, table: {table_name}"
+    )
+
     cursor.execute(
         """
         SELECT
@@ -420,11 +574,19 @@ def get_rules_are(cursor: TextIO, schema_name: str, table_name: str) -> List[str
         (schema_name, table_name),
     )
     records = cursor.fetchone()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(
+            f"No Rules found for schema: {schema_name}, table: {table_name}"
+        )
+        return []
+    logging.debug(f"Rules returned: {records.rules_are}")
     return records.rules_are
 
 
 @log_function_call
 def get_languages_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get languages info.")
     cursor.execute(
         """
         SELECT
@@ -433,13 +595,18 @@ def get_languages_info(cursor: TextIO) -> List[str]:
             l.lanpltrusted AS is_trusted
         FROM
             pg_catalog.pg_language AS l
-    """
+        """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No language info found.")
+    return records
 
 
 @log_function_call
 def get_tablespace_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get tablespace info.")
     cursor.execute(
         """
         SELECT
@@ -447,13 +614,18 @@ def get_tablespace_info(cursor: TextIO) -> List[str]:
             pg_get_userbyid( t.spcowner ) AS owner_is
         FROM
             pg_catalog.pg_tablespace AS t
-    """
+        """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No tablespace info found.")
+    return records
 
 
 @log_function_call
 def get_role_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get role info.")
     cursor.execute(
         """
         SELECT
@@ -502,13 +674,18 @@ def get_role_info(cursor: TextIO) -> List[str]:
             r.rolvaliduntil,
             r.rolbypassrls,
             r.rolconfig
-    """
+        """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No role info found.")
+    return records
 
 
 @log_function_call
 def get_extension_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get extension info.")
     cursor.execute(
         """
         SELECT
@@ -521,11 +698,16 @@ def get_extension_info(cursor: TextIO) -> List[str]:
             JOIN pg_catalog.pg_namespace AS n ON ( n.oid = e.extnamespace )
     """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No extension info found.")
+    return records
 
 
 @log_function_call
 def get_database_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get database info.")
     cursor.execute(
         """
         SELECT
@@ -537,11 +719,16 @@ def get_database_info(cursor: TextIO) -> List[str]:
             d.datname = current_database()
     """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No database info found.")
+    return records
 
 
 @log_function_call
 def get_schema_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get schema info.")
     cursor.execute(
         """
         SELECT
@@ -555,11 +742,16 @@ def get_schema_info(cursor: TextIO) -> List[str]:
             n.nspname NOT ILIKE 'pg_%'
     """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No schema info found.")
+    return records
 
 
 @log_function_call
 def get_table_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get table info.")
     cursor.execute(
         """
         SELECT
@@ -594,11 +786,16 @@ def get_table_info(cursor: TextIO) -> List[str]:
             c.relname
     """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No table info found.")
+    return records
 
 
 @log_function_call
 def get_column_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get column info.")
     cursor.execute(
         """
         SELECT
@@ -640,13 +837,20 @@ def get_column_info(cursor: TextIO) -> List[str]:
             a.attnum
     """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No column info found.")
+    return records
 
 
 @log_function_call
 def get_con_columns_are(
     cursor: TextIO, schema_name: str, table_name: str, con_type: str
 ) -> List[str]:
+    logging.debug(
+        f"Executing query to get constraint columns are for schema: {schema_name}, table: {table_name}, constraint type: {con_type}"
+    )
     cursor.execute(
         """
         SELECT
@@ -655,7 +859,7 @@ def get_con_columns_are(
                     a.attname
                 FROM
                     pg_catalog.pg_attribute a
-                    JOIN generate_series(1, array_upper(x.conkey, 1)) s(i) ON ( a.attnum = x.conkey[i] )
+                    JOIN generate_series(1, array_upper(x.conkey, 1)) s(i) ON ( a.attnum = x.conkey[I] )
                 WHERE
                     attrelid = x.conrelid
                 ORDER BY i
@@ -669,16 +873,25 @@ def get_con_columns_are(
             c.relname = %s AND
             x.contype = %s
         ORDER BY 1
-    """,
+        """,
         (schema_name, table_name, con_type),
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(
+            f"No constraint columns are found for schema: {schema_name}, table: {table_name}, constraint type: {con_type}"
+        )
+    return records
 
 
 @log_function_call
 def get_con_columns_arent(
     cursor: TextIO, schema_name: str, table_name: str, con_type: str
 ) -> List[str]:
+    logging.debug(
+        f"Executing query to get constraint columns arent for schema: {schema_name}, table: {table_name}, constraint type: {con_type}"
+    )
     cursor.execute(
         """
         WITH pkc AS (
@@ -724,11 +937,18 @@ def get_con_columns_arent(
     """,
         (schema_name, table_name, con_type, schema_name, table_name),
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(
+            f"No constraint columns arent found for schema: {schema_name}, table: {table_name}, constraint type: {con_type}"
+        )
+    return records
 
 
 @log_function_call
 def get_table_family_tree(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get table family tree.")
     cursor.execute(
         """
         WITH RECURSIVE inheritance_chain AS (
@@ -784,11 +1004,18 @@ def get_table_family_tree(cursor: TextIO) -> List[str]:
             inheritance_chain
     """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No table family info found.")
+    return records
 
 
 @log_function_call
 def get_is_partition_of(cursor: TextIO, schema_name: str, table_name: str) -> List[str]:
+    logging.debug(
+        f"Executing query to check if table {table_name} in schema {schema_name} is a partition."
+    )
     cursor.execute(
         """
         SELECT
@@ -797,21 +1024,28 @@ def get_is_partition_of(cursor: TextIO, schema_name: str, table_name: str) -> Li
         FROM
             pg_catalog.pg_namespace cn
             JOIN pg_catalog.pg_class cc ON ( cc.relnamespace = cn.oid )
-            JOIN pg_catalog.pg_inherits i ON ( i.inhrelid = cc.oid )
+            JOIN pg_catalog.pg_inherits I ON ( i.inhrelid = cc.oid )
             JOIN pg_catalog.pg_class pc ON ( pc.oid = i.inhparent )
             JOIN pg_catalog.pg_namespace pn ON ( pn.oid = pc.relnamespace )
         WHERE
             pc.relkind = 'p' AND
             cn.nspname = %s AND
             cc.relname = %s
-    """,
+        """,
         (schema_name, table_name),
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(
+            f"No parent partition found for table {table_name} in schema {schema_name}"
+        )
+    return records
 
 
 @log_function_call
 def get_index_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get index info.")
     cursor.execute(
         """
         SELECT DISTINCT
@@ -870,12 +1104,16 @@ def get_index_info(cursor: TextIO) -> List[str]:
             n.nspname NOT ILIKE 'pg_%'
     """
     )
-    rows = cursor.fetchall()
-    return rows
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No index info found.")
+    return records
 
 
 @log_function_call
 def get_rule_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get rule info.")
     cursor.execute(
         """
         SELECT
@@ -905,11 +1143,16 @@ def get_rule_info(cursor: TextIO) -> List[str]:
           r.rulename
     """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No rule info found.")
+    return records
 
 
 @log_function_call
 def get_foreign_key_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get foreign key info.")
     cursor.execute(
         """
         SELECT
@@ -974,11 +1217,16 @@ def get_foreign_key_info(cursor: TextIO) -> List[str]:
             c2.relname
     """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No foreign key info found.")
+    return records
 
 
 @log_function_call
 def get_trigger_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get trigger info.")
     cursor.execute(
         """
         SELECT
@@ -1007,11 +1255,16 @@ def get_trigger_info(cursor: TextIO) -> List[str]:
             p.proname
     """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No trigger info found.")
+    return records
 
 
 @log_function_call
 def get_sequence_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get sequence info.")
     cursor.execute(
         """
         SELECT
@@ -1026,11 +1279,16 @@ def get_sequence_info(cursor: TextIO) -> List[str]:
             pg_catalog.pg_sequences
     """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No sequence info found.")
+    return records
 
 
 @log_function_call
 def get_view_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get view info.")
     cursor.execute(
         """
         SELECT
@@ -1071,11 +1329,16 @@ def get_view_info(cursor: TextIO) -> List[str]:
             view_owner
     """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No view info found.")
+    return records
 
 
 @log_function_call
 def get_materialized_view_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get materialized view info.")
     cursor.execute(
         """
         SELECT
@@ -1090,11 +1353,16 @@ def get_materialized_view_info(cursor: TextIO) -> List[str]:
             c.relkind = 'm'
     """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No materialized view info found.")
+    return records
 
 
 @log_function_call
 def get_foreign_table_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get foreign table info.")
     cursor.execute(
         """
         SELECT
@@ -1113,12 +1381,18 @@ def get_foreign_table_info(cursor: TextIO) -> List[str]:
             c.relkind = 'f'
     """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No foreign table info found.")
+    return records
 
 
 @log_function_call
 def get_data_type_info(cursor: TextIO, kinds: List[str] = None) -> List[str]:
+    logging.debug(f"Validating kinds for data types: {kinds}")
     validate_kinds("pg_type", kinds)
+    logging.debug(f"Executing query to get data type info for kinds: {kinds}")
     cursor.execute(
         """
         SELECT
@@ -1148,24 +1422,35 @@ def get_data_type_info(cursor: TextIO, kinds: List[str] = None) -> List[str]:
             pg_get_userbyid( t.typowner ),
             dn.nspname,
             dt.oid
-    """,
+        """,
         [kinds],
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No data type info found.")
+    return records
 
 
 @log_function_call
 def get_enum_info(cursor: TextIO) -> List[str]:
-    return get_data_type_info(cursor, kinds=["e"])
+    logging.debug("Executing query to get enum info.")
+    result = get_data_type_info(cursor, kinds=["e"])
+    logging.debug("Enum info fetched successfully.")
+    return result
 
 
 @log_function_call
 def get_domain_info(cursor: TextIO) -> List[str]:
-    return get_data_type_info(cursor, ["d"])
+    logging.debug("Executing query to get domain info.")
+    result = get_data_type_info(cursor, kinds=["d"])
+    logging.debug("Domain info fetched successfully.")
+    return result
 
 
 @log_function_call
 def get_function_info(cursor: TextIO) -> List[str]:
+    logging.debug("Executing query to get function info.")
     cursor.execute(
         """
         SELECT
@@ -1229,14 +1514,23 @@ def get_function_info(cursor: TextIO) -> List[str]:
             pro_returns
     """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No function info found.")
+    return records
 
 
 @log_function_call(log_level=logging.INFO, info_message="TODO: Implementation pending!")
 def get_acl_info(cursor: TextIO) -> List[str]:
     return
+    logging.debug("Executing query to get acl info.")
     cursor.execute(
         """
     """
     )
-    return cursor.fetchall()
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No acl info found.")
+    return records
