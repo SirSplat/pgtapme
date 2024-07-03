@@ -42,12 +42,7 @@ COPY --from=build /usr/local/lib/postgresql /usr/local/lib/postgresql
 COPY --from=build /usr/local/share/postgresql/extension /usr/local/share/postgresql/extension
 COPY --from=build /usr/local/bin/pg_prove /usr/local/bin/pg_prove
 
-# # Add configuration for pg_cron and pg_partman in the PostgreSQL config
-# RUN echo "shared_preload_libraries = 'pg_partman_bgw, pg_cron'" >> /usr/local/share/postgresql/postgresql.conf.sample \
-#     && echo "cron.database_name = 'manager'" >> /usr/local/share/postgresql/postgresql.conf.sample \
-#     && echo "pg_partman_bgw.role = 'dbo'" >> /usr/local/share/postgresql/postgresql.conf.sample \
-#     && echo "pg_partman_bgw.interval = 3600" >> /usr/local/share/postgresql/postgresql.conf.sample \
-#     && echo "pg_partman_bgw.dbname = 'pgtapme'" >> /usr/local/share/postgresql/postgresql.conf.sample
+RUN echo "include_dir '/etc/postgresql/conf.d'" >> /usr/local/share/postgresql/postgresql.conf.sample
 
 # Set the working directory
 WORKDIR /code

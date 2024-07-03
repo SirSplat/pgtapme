@@ -26,9 +26,7 @@ COPY --from=build /usr/local/lib/postgresql /usr/local/lib/postgresql
 COPY --from=build /usr/local/share/postgresql/extension /usr/local/share/postgresql/extension
 COPY --from=build /usr/local/bin/pg_prove /usr/local/bin/pg_prove
 
-# Add configuration for pg_cron and pg_partman in the PostgreSQL config
-RUN echo "max_wal_size = '2GB'" >> /usr/local/share/postgresql/postgresql.conf.sample \
-    && echo "checkpoint_timeout = '30min'" >> /usr/local/share/postgresql/postgresql.conf.sample
+RUN echo "include_dir '/etc/postgresql/conf.d'" >> /usr/local/share/postgresql/postgresql.conf.sample
 
 # Set the working directory
 WORKDIR /code
