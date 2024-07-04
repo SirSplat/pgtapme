@@ -1,6 +1,6 @@
 import logging
-from typing import List, Optional
 from io import TextIOWrapper
+from typing import List, Optional
 
 from src.helpers import format_array_parameter, log_function_call
 
@@ -13,6 +13,12 @@ def write_select_for_schema_name(
     description: str,
     schema_name: Optional[str] = None,
 ) -> None:
+    logging.debug(
+        f"Writing SELECT statement for function: {function_name} with parameters: {parameters} and description: {description}"
+    )
+    if schema_name:
+        logging.debug(f"Including schema name: {schema_name}")
+
     """
     Writes a SELECT statement for a SQL function with optional schema_name.
 
@@ -41,44 +47,63 @@ def write_select_for_schema_name(
     f.write(
         f"  SELECT {function_name}({schema_clause}{array_str}, '{description}');\n\n"
     )
+    logging.debug(f"SELECT statement written to file: {f.name}")
 
 
 @log_function_call
 def write_tests_header(f: TextIOWrapper) -> None:
+    logging.debug(f"Writing tests header to file: {f.name}")
     f.write(f"BEGIN;\n")
     f.write(f"  SELECT plan(0);\n\n")
+    logging.debug("Tests header written successfully.")
 
 
 @log_function_call
 def write_languages_are(f: TextIOWrapper, languages_are: str) -> None:
+    logging.debug(
+        f"Writing languages_are statement to file: {f.name} with languages: {languages_are}"
+    )
     array_str = format_array_parameter(languages_are)
     f.write(
         f"  SELECT languages_are( {array_str}, 'Cluster should have the correct languages.');\n\n"
     )
+    logging.debug("languages_are statement written successfully.")
 
 
 @log_function_call
 def write_tablespaces_are(f: TextIOWrapper, tablespaces_are: str) -> None:
+    logging.debug(
+        f"Writing tablespaces_are statement to file: {f.name} with tablespaces: {tablespaces_are}"
+    )
     array_str = format_array_parameter(tablespaces_are)
     f.write(
         f"  SELECT tablespaces_are( {array_str}, 'Cluster should have the correct tablespaces.');\n\n"
     )
+    logging.debug("tablespaces_are statement written successfully.")
 
 
 @log_function_call
 def write_roles_are(f: TextIOWrapper, roles_are: str) -> None:
+    logging.debug(
+        f"Writing roles_are statement to file: {f.name} with roles: {roles_are}"
+    )
     array_str = format_array_parameter(roles_are)
     f.write(
         f"  SELECT roles_are( {array_str}, 'Cluster should have the correct roles.');\n\n"
     )
+    logging.debug("roles_are statement written successfully.")
 
 
 @log_function_call
 def write_groups_are(f: TextIOWrapper, groups_are: str) -> None:
+    logging.debug(
+        f"Writing groups_are statement to file: {f.name} with groups: {groups_are}"
+    )
     array_str = format_array_parameter(groups_are)
     f.write(
         f"  SELECT groups_are( {array_str}, 'Cluster should have the correct groups.');\n\n"
     )
+    logging.debug("groups_are statement written successfully.")
 
 
 @log_function_call
@@ -98,9 +123,7 @@ def write_casts_are(f: TextIOWrapper, casts_are: str) -> None:
 
 
 @log_function_call
-def write_schemas_are(
-    f: TextIOWrapper, database_name: str, schema_names: str
-) -> None:
+def write_schemas_are(f: TextIOWrapper, database_name: str, schema_names: str) -> None:
     array_str = format_array_parameter(schema_names)
     f.write(
         f"  SELECT schemas_are( {array_str}, 'Database {database_name} should have the correct schemas.');\n\n"
@@ -144,9 +167,7 @@ def write_materialized_views_are(
 
 
 @log_function_call
-def write_sequences_are(
-    f: TextIOWrapper, schema_name: str, sequences_are: str
-) -> None:
+def write_sequences_are(f: TextIOWrapper, schema_name: str, sequences_are: str) -> None:
     array_str = format_array_parameter(sequences_are)
     f.write(
         f"  SELECT sequences_are('{schema_name}', {array_str}, 'Schema {schema_name} should have the correct sequences.');\n\n"
@@ -154,9 +175,7 @@ def write_sequences_are(
 
 
 @log_function_call
-def write_functions_are(
-    f: TextIOWrapper, schema_name: str, functions_are: str
-) -> None:
+def write_functions_are(f: TextIOWrapper, schema_name: str, functions_are: str) -> None:
     array_str = format_array_parameter(functions_are)
     f.write(
         f"  SELECT functions_are('{schema_name}', {array_str}, 'Schema {schema_name} should have the correct functions.');\n\n"
@@ -164,9 +183,7 @@ def write_functions_are(
 
 
 @log_function_call
-def write_opclasses_are(
-    f: TextIOWrapper, schema_name: str, opclasses_are: str
-) -> None:
+def write_opclasses_are(f: TextIOWrapper, schema_name: str, opclasses_are: str) -> None:
     array_str = format_array_parameter(opclasses_are)
     f.write(
         f"  SELECT opclasses_are('{schema_name}', {array_str}, 'Schema {schema_name} should have the correct opclasses.');\n\n"
@@ -198,9 +215,7 @@ def write_enums_are(f: TextIOWrapper, schema_name: str, enums_are: str) -> None:
 
 
 @log_function_call
-def write_operators_are(
-    f: TextIOWrapper, schema_name: str, operators_are: str
-) -> None:
+def write_operators_are(f: TextIOWrapper, schema_name: str, operators_are: str) -> None:
     array_str = format_array_parameter(operators_are)
     f.write(
         f"  SELECT operators_are('{schema_name}', {array_str}, 'Schema {schema_name} should have the correct operators.');\n\n"
@@ -561,18 +576,14 @@ def write_isnt_descendent_of(
 
 
 @log_function_call
-def write_isnt_partitioned(
-    f: TextIOWrapper, schema_name: str, table_name: str
-) -> None:
+def write_isnt_partitioned(f: TextIOWrapper, schema_name: str, table_name: str) -> None:
     f.write(
         f"  SELECT isnt_partitioned('{schema_name}', '{table_name}', 'Table {schema_name}.{table_name} should not be partitioned.');\n\n"
     )
 
 
 @log_function_call
-def write_is_partitioned(
-    f: TextIOWrapper, schema_name: str, table_name: str
-) -> None:
+def write_is_partitioned(f: TextIOWrapper, schema_name: str, table_name: str) -> None:
     f.write(
         f"  SELECT is_partitioned('{schema_name}', '{table_name}', 'Table {schema_name}.{table_name} should be partitioned.');\n\n"
     )
@@ -850,9 +861,7 @@ def write_sequence_owner_is(
 
 
 @log_function_call
-def write_has_sequence(
-    f: TextIOWrapper, schema_name: str, sequence_name: str
-) -> None:
+def write_has_sequence(f: TextIOWrapper, schema_name: str, sequence_name: str) -> None:
     f.write(
         f"  SELECT has_sequence('{schema_name}', '{sequence_name}', 'Sequence {schema_name}.{sequence_name} should exist.');\n\n"
     )
@@ -893,9 +902,7 @@ def write_has_materialized_view(
 
 
 @log_function_call
-def write_has_foreign_table(
-    f: TextIOWrapper, mtv_schema: str, mtv_name: str
-) -> None:
+def write_has_foreign_table(f: TextIOWrapper, mtv_schema: str, mtv_name: str) -> None:
     f.write(
         f"  SELECT has_materialized_view('{mtv_schema}', '{mtv_name}', 'Materialized view {mtv_schema}.{mtv_name} should exist.');\n\n"
     )
@@ -1170,9 +1177,7 @@ def write_has_domain(f: TextIOWrapper, schema: str, name: str) -> None:
 
 
 @log_function_call
-def write_type_owner_is(
-    f: TextIOWrapper, schema: str, name: str, owner: str
-) -> None:
+def write_type_owner_is(f: TextIOWrapper, schema: str, name: str, owner: str) -> None:
     f.write(
         f"  SELECT type_owner_is('{schema}', '{name}', '{owner}', 'Type {schema}.{name} should have the correct owner.');\n\n"
     )
