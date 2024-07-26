@@ -5,13 +5,9 @@ FROM postgres:16-alpine AS build
 RUN apk add --no-cache --update \
     postgresql-dev postgresql-contrib git openssl build-base make perl perl-dev less wget \
     llvm15-dev clang15 \
-    && rm -rf /var/cache/apk/* /tmp/*
-
-# Install pgTAP
-RUN cpan TAP::Parser::SourceHandler::pgTAP
-
-# Clone, build, and install pgTAP
-RUN git clone https://github.com/theory/pgtap.git \
+    && rm -rf /var/cache/apk/* /tmp/* \
+    && cpan TAP::Parser::SourceHandler::pgTAP \
+    && git clone https://github.com/theory/pgtap.git \
     && cd pgtap \
     && make \
     && make install \

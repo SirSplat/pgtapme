@@ -1,19 +1,25 @@
 # pgtapme
+PGtapme is a tool for generating pg_prove style tests using PostgreSQL databasesand pgTAP. It provides a modular and extensible framework to create tests for different aspects of your database schema.
 
-PGTapMe
+## Configuration
+### .env
+Before using pgtapme, you need to configure the database connection and set up the types of tests you want to generate.
 
-PGtapme is a tool for generating pgTap tests for PostgreSQL databases. It provides a modular and extensible framework to create tests for different aspects of your database schema.
-Configuration
-
-Before using PGtapme, you need to configure the database connection and set up the types of tests you want to generate. Edit the .env file to include your database connection details and specify the test types you are interested in.
-
-DATABASE_NAME = dvdrental
+Edit the .env file to include your database connection details or you can pass these via the command line.
+```
+DATABASE_NAME = pgtapme
 DATABASE_USER = dbo
 DATABASE_USER_PASSWORD = mysecretpassword
 DATABASE_HOST = localhost
 DATABASE_PORT = 5432
+```
 
-Usage
+### config.json
+
+```
+
+```
+## Usage
 
 To run PGtapme, execute the pgtapme.py script. This script reads the configurations from config.json and the .env files then generates PGTap tests for the specified test types.
 
