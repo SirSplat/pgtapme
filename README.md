@@ -159,6 +159,4 @@ And there you have it.
 # Copyright and License
 [MIT License](./LICENSE)
 
-[Copyright](./copyright.md)
-
 [Copyright pgTAP](./copyright_pgtap.md)
