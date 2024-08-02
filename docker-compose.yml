@@ -23,7 +23,7 @@ services:
       POSTGRES_DB: postgres
     user: postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - ./db/conf.d:/etc/postgresql/conf.d
 
@@ -35,6 +35,7 @@ services:
       - ./sqitch/.sqitch/.pgpass:/home/.pgpass:ro
       - ./sqitch/sqitch.sh:/home/sqitch.sh
       - ./sqitch/migrations/:/mnt/migrations/
+      - ./sqitch/migrations/sqitch.conf:/mnt/migrations/sqitch.conf
     working_dir: /mnt/migrations
     entrypoint: /bin/bash
     command: -c "tail -f /dev/null"

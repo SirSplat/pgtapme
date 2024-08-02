@@ -3,45 +3,45 @@
 %uri=https://github.com/SirSplat/pgtapme.git
 
 
-appschema 2024-06-24T17:01:17Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Add application schema.
-comments/appschema [appschema] 2024-06-24T17:11:15Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Add application schema description.
-extschema 2024-06-24T17:46:07Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Add application extension schema.
-comments/extschema [extschema] 2024-06-24T17:49:41Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Add application extension schema description.
-gist_ext [extschema] 2024-06-24T17:52:57Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Add gist extension.
-comments/gist_ext [extschema gist_ext] 2024-06-26T11:18:27Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Used in the date_range_gist function.
-tables/lkp_dow [appschema] 2024-06-25T07:39:12Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Add Day of Week Lookup table.
-comments/lkp_dow [appschema tables/lkp_dow] 2024-06-26T10:10:11Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Add relation comment.
-functions/lkp_dow_populate-date-date [appschema tables/lkp_dow] 2024-06-25T07:44:01Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Populate Day of Week Lookup table (pgtapme.lkp_dow)
-comments/lkp_dow_populate-date-date [appschema functions/lkp_dow_populate-date-date] 2024-06-26T12:09:25Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Create pgtapme.lkp_dow_populate(date, date) function which populates the pgtapme.lkp_dow table.
-tables/lkp_mth [appschema] 2024-06-25T09:19:14Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Add Month Lookup table.
-comments/lkp_mth [appschema tables/lkp_mth] 2024-06-26T12:57:57Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.lkp_mth comment.
-functions/lkp_mth_populate-date-date [appschema tables/lkp_mth] 2024-06-25T09:23:16Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Populate Month Lookup table (pgtapme.lkp_mth)
-comments/lkp_mth_populate-date-date [appschema functions/lkp_mth_populate-date-date] 2024-06-26T13:01:20Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Create pgtapme.lkp_mth_populate(date, date) function which populates the pgtapme.lkp_mth table.
-functions/date_range_gist-date-date [appschema] 2024-06-25T10:40:43Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.date_range(date, date) function to be used by gist indexes.
-data/lkp_dow_populate [appschema tables/lkp_dow functions/lkp_dow_populate-date-date] 2024-06-25T12:11:17Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Populate pgtapme.lkp_dow table.
-data/lkp_mth_populate [appschema tables/lkp_mth functions/lkp_mth_populate-date-date] 2024-06-25T14:08:52Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Populate pgtapme.lkp_mth table.
-materialized_views/lkp_mth_mv [appschema tables/lkp_mth data/lkp_mth_populate] 2024-06-25T16:30:30Z sqitch <Leon.Rogers@BlueElephantDBA.co.uk> # Create lkp_mth materialized view.
-tables/d_date_with_exclusion_constraint [appschema tables/lkp_dow tables/lkp_mth extschema gist_ext] 2024-06-30T12:16:17Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_exclusion.
-comments/d_date_with_exclusion_constraint [appschema tables/d_date_with_exclusion_constraint] 2024-06-30T12:21:08Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_exclusion comment.
-functions/d_date_exclusion_populate-date-date [appschema tables/d_date_with_exclusion_constraint] 2024-07-01T11:36:42Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Create pgtpame.d_date_exclusion_populate(date, date) function.
-comments/d_date_exclusion_populate-date-date [appschema functions/d_date_exclusion_populate-date-date] 2024-07-01T11:52:05Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtpame.d_date_exclusion_populate(date, date) function comment.
-data/d_date_exclusion_populate [appschema tables/d_date_with_exclusion_constraint functions/d_date_exclusion_populate-date-date] 2024-07-01T11:58:12Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Actually call pgtapme.d_date_exclusion_populate( date, date ) function to populate pgtapme.d_date_exclusion.
-tables/d_date_declarative [appschema tables/d_date_with_exclusion_constraint data/d_date_exclusion_populate] 2024-07-01T13:33:00Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_declarative partitioned table.
-comments/d_date_declarative [appschema tables/d_date_declarative] 2024-07-01T14:05:50Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_declarative partitioned table comment.
-functions/d_date_declarative_create_partitions-date-date [appschema tables/d_date_declarative] 2024-07-01T14:12:24Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_declarative create partitions function.
-comments/d_date_declarative_create_partitions-date-date [appschema functions/d_date_declarative_create_partitions-date-date] 2024-07-01T14:38:20Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_declarative_create_partitions-date-date function comment.
-tables/d_date_declarative_create_partitions [appschema tables/d_date_declarative functions/d_date_declarative_create_partitions-date-date] 2024-07-01T14:49:37Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Create pgtapme.d_date_declarative partitions.
-functions/d_date_declarative_remove_partitions-date-date [appschema tables/d_date_declarative] 2024-07-02T08:02:40Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_declarative remove partitions function.
-data/d_date_declarative_populate_partitions [appschema tables/d_date_with_exclusion_constraint data/d_date_exclusion_populate tables/d_date_declarative] 2024-07-02T08:11:54Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_declarative populate function.
-tables/d_date_inherit [appschema] 2024-07-02T08:28:32Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_inherit parent table.
-tables/d_date_inherit_create_partitions [appschema tables/d_date_inherit] 2024-07-02T08:36:53Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_inherit partitions.
-functions/d_date_inherit_create_trigger_function [appschema tables/d_date_inherit] 2024-07-02T09:18:07Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_inherit trigger function.
-functions/d_date_inherit_trigger [appschema tables/d_date_inherit functions/d_date_inherit_create_trigger_function] 2024-07-02T09:41:05Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_inherit trigger.
-data/d_date_inherit_populate_partitions [appschema tables/d_date_inherit] 2024-07-02T09:13:21Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_inherit data.
-tables/d_date_rule [appschema] 2024-07-02T09:54:09Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_rule parent table.
-tables/d_date_rule_create_partitions [appschema tables/d_date_rule] 2024-07-02T10:04:11Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_rule partitions.
-rules/d_date_rule_create_insert_rule [appschema tables/d_date_rule tables/d_date_rule_create_partitions] 2024-07-02T10:23:33Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_rule create insert rule.
-rules/d_date_rule_create_update_rule [appschema tables/d_date_rule tables/d_date_rule_create_partitions] 2024-07-02T10:42:03Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_rule create update rule.
-rules/d_date_rule_create_delete_rule [appschema tables/d_date_rule tables/d_date_rule_create_partitions] 2024-07-02T10:50:31Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_rule create delete rule.
-data/d_date_rule_populate_partitions [appschema tables/d_date_rule rules/d_date_rule_create_insert_rule rules/d_date_rule_create_update_rule rules/d_date_rule_create_delete_rule] 2024-07-02T11:27:40Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_rule data.
-@v1.0 2024-07-02T11:37:18Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Tag v1.0 of pgtapme.py development database
+appschema 2024-06-24T17:01:17Z dbo <dbo@pgtapme.com> # Add application schema.
+comments/appschema [appschema] 2024-06-24T17:11:15Z dbo <dbo@pgtapme.com> # Add application schema description.
+extschema 2024-06-24T17:46:07Z dbo <dbo@pgtapme.com> # Add application extension schema.
+comments/extschema [extschema] 2024-06-24T17:49:41Z dbo <dbo@pgtapme.com> # Add application extension schema description.
+gist_ext [extschema] 2024-06-24T17:52:57Z dbo <dbo@pgtapme.com> # Add gist extension.
+comments/gist_ext [extschema gist_ext] 2024-06-26T11:18:27Z dbo <dbo@pgtapme.com> # Used in the date_range_gist function.
+tables/lkp_dow [appschema] 2024-06-25T07:39:12Z dbo <dbo@pgtapme.com> # Add Day of Week Lookup table.
+comments/lkp_dow [appschema tables/lkp_dow] 2024-06-26T10:10:11Z dbo <dbo@pgtapme.com> # Add relation comment.
+functions/lkp_dow_populate-date-date [appschema tables/lkp_dow] 2024-06-25T07:44:01Z dbo <dbo@pgtapme.com> # Populate Day of Week Lookup table (pgtapme.lkp_dow)
+comments/lkp_dow_populate-date-date [appschema functions/lkp_dow_populate-date-date] 2024-06-26T12:09:25Z dbo <dbo@pgtapme.com> # Create pgtapme.lkp_dow_populate(date, date) function which populates the pgtapme.lkp_dow table.
+tables/lkp_mth [appschema] 2024-06-25T09:19:14Z dbo <dbo@pgtapme.com> # Add Month Lookup table.
+comments/lkp_mth [appschema tables/lkp_mth] 2024-06-26T12:57:57Z dbo <dbo@pgtapme.com> # Add pgtapme.lkp_mth comment.
+functions/lkp_mth_populate-date-date [appschema tables/lkp_mth] 2024-06-25T09:23:16Z dbo <dbo@pgtapme.com> # Populate Month Lookup table (pgtapme.lkp_mth)
+comments/lkp_mth_populate-date-date [appschema functions/lkp_mth_populate-date-date] 2024-06-26T13:01:20Z dbo <dbo@pgtapme.com> # Create pgtapme.lkp_mth_populate(date, date) function which populates the pgtapme.lkp_mth table.
+functions/date_range_gist-date-date [appschema] 2024-06-25T10:40:43Z dbo <dbo@pgtapme.com> # Add pgtapme.date_range(date, date) function to be used by gist indexes.
+data/lkp_dow_populate [appschema tables/lkp_dow functions/lkp_dow_populate-date-date] 2024-06-25T12:11:17Z dbo <dbo@pgtapme.com> # Populate pgtapme.lkp_dow table.
+data/lkp_mth_populate [appschema tables/lkp_mth functions/lkp_mth_populate-date-date] 2024-06-25T14:08:52Z dbo <dbo@pgtapme.com> # Populate pgtapme.lkp_mth table.
+materialized_views/lkp_mth_mv [appschema tables/lkp_mth data/lkp_mth_populate] 2024-06-25T16:30:30Z dbo <dbo@pgtapme.com> # Create lkp_mth materialized view.
+tables/d_date_with_exclusion_constraint [appschema tables/lkp_dow tables/lkp_mth extschema gist_ext] 2024-06-30T12:16:17Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_exclusion.
+comments/d_date_with_exclusion_constraint [appschema tables/d_date_with_exclusion_constraint] 2024-06-30T12:21:08Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_exclusion comment.
+functions/d_date_exclusion_populate-date-date [appschema tables/d_date_with_exclusion_constraint] 2024-07-01T11:36:42Z dbo <dbo@pgtapme.com> # Create pgtpame.d_date_exclusion_populate(date, date) function.
+comments/d_date_exclusion_populate-date-date [appschema functions/d_date_exclusion_populate-date-date] 2024-07-01T11:52:05Z dbo <dbo@pgtapme.com> # Add pgtpame.d_date_exclusion_populate(date, date) function comment.
+data/d_date_exclusion_populate [appschema tables/d_date_with_exclusion_constraint functions/d_date_exclusion_populate-date-date] 2024-07-01T11:58:12Z dbo <dbo@pgtapme.com> # Actually call pgtapme.d_date_exclusion_populate( date, date ) function to populate pgtapme.d_date_exclusion.
+tables/d_date_declarative [appschema tables/d_date_with_exclusion_constraint data/d_date_exclusion_populate] 2024-07-01T13:33:00Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_declarative partitioned table.
+comments/d_date_declarative [appschema tables/d_date_declarative] 2024-07-01T14:05:50Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_declarative partitioned table comment.
+functions/d_date_declarative_create_partitions-date-date [appschema tables/d_date_declarative] 2024-07-01T14:12:24Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_declarative create partitions function.
+comments/d_date_declarative_create_partitions-date-date [appschema functions/d_date_declarative_create_partitions-date-date] 2024-07-01T14:38:20Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_declarative_create_partitions-date-date function comment.
+tables/d_date_declarative_create_partitions [appschema tables/d_date_declarative functions/d_date_declarative_create_partitions-date-date] 2024-07-01T14:49:37Z dbo <dbo@pgtapme.com> # Create pgtapme.d_date_declarative partitions.
+functions/d_date_declarative_remove_partitions-date-date [appschema tables/d_date_declarative] 2024-07-02T08:02:40Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_declarative remove partitions function.
+data/d_date_declarative_populate_partitions [appschema tables/d_date_with_exclusion_constraint data/d_date_exclusion_populate tables/d_date_declarative] 2024-07-02T08:11:54Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_declarative populate function.
+tables/d_date_inherit [appschema] 2024-07-02T08:28:32Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_inherit parent table.
+tables/d_date_inherit_create_partitions [appschema tables/d_date_inherit] 2024-07-02T08:36:53Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_inherit partitions.
+functions/d_date_inherit_create_trigger_function [appschema tables/d_date_inherit] 2024-07-02T09:18:07Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_inherit trigger function.
+functions/d_date_inherit_trigger [appschema tables/d_date_inherit functions/d_date_inherit_create_trigger_function] 2024-07-02T09:41:05Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_inherit trigger.
+data/d_date_inherit_populate_partitions [appschema tables/d_date_inherit] 2024-07-02T09:13:21Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_inherit data.
+tables/d_date_rule [appschema] 2024-07-02T09:54:09Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_rule parent table.
+tables/d_date_rule_create_partitions [appschema tables/d_date_rule] 2024-07-02T10:04:11Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_rule partitions.
+rules/d_date_rule_create_insert_rule [appschema tables/d_date_rule tables/d_date_rule_create_partitions] 2024-07-02T10:23:33Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_rule create insert rule.
+rules/d_date_rule_create_update_rule [appschema tables/d_date_rule tables/d_date_rule_create_partitions] 2024-07-02T10:42:03Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_rule create update rule.
+rules/d_date_rule_create_delete_rule [appschema tables/d_date_rule tables/d_date_rule_create_partitions] 2024-07-02T10:50:31Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_rule create delete rule.
+data/d_date_rule_populate_partitions [appschema tables/d_date_rule rules/d_date_rule_create_insert_rule rules/d_date_rule_create_update_rule rules/d_date_rule_create_delete_rule] 2024-07-02T11:27:40Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_rule data.
+@v1.0 2024-07-02T11:37:18Z dbo <dbo@pgtapme.com> # Tag v1.0 of pgtapme.py development database

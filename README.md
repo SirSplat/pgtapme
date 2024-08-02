@@ -9,6 +9,55 @@ I did this to for a few reasons:
 * So I had to learn [pgTAP]() and [pg_prove]() Perl code anyway :)
 
 # How to use this
+## Start the cluster
+    docker compose up -d
+
+## Create the pgtapme database
+    ```
+    docker compose exec pgtapme_db bash /code/initdb.sh
+    ```
+
+    This will produce output simiar to:
+    ```
+    # On database pgtapme
+    Database pgtapme has not been initialized for Sqitch
+    ```
+
+## Initialize the pgtapme database
+    ```
+    docker compose exec -it sqitch sqitch status pgtapme --chdir /mnt/migrations
+    ```
+    This will produce output similar to:
+    ```
+    Adding registry tables to pgtapme
+    Deploying changes to pgtapme
+      + appschema ................................................. ok
+      + comments/appschema ........................................ ok
+      + extschema ................................................. ok
+      + comments/extschema ........................................ ok
+      + gist_ext .................................................. ok
+      + comments/gist_ext ......................................... ok
+      + tables/lkp_dow ............................................ ok
+      + comments/lkp_dow .......................................... ok
+      + functions/lkp_dow_populate-date-date ...................... ok
+      + comments/lkp_dow_populate-date-date ....................... ok
+      + tables/lkp_mth ............................................ ok
+      + comments/lkp_mth .......................................... ok
+      .
+      .
+      .
+      + rules/d_date_rule_create_insert_rule ...................... ok
+      + rules/d_date_rule_create_update_rule ...................... ok
+      + rules/d_date_rule_create_delete_rule ...................... ok
+      + data/d_date_rule_populate_partitions @v1.0 ................ ok
+    ```
+    That output is a good thing, you can see the final TAG "@v1.0" this matches the TAG from your sqitch.plan
+    ```
+    
+    ```
+    ```
+    docker compose exec -it sqitch sqitch deploy pgtapme --chdir /mnt/migrations
+    ```
 
 # License
 [MIT License](./LICENSE)
