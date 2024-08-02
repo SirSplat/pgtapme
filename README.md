@@ -152,7 +152,7 @@ If everything went well, but if something failed you should see something output
     Files=2479, Tests=26589, 79 wallclock secs ( 4.09 usr  2.30 sys + 44.94 cusr  5.06 csys = 56.39 CPU)
     Result: FAIL
 
-And there you have it. A complete suite of pgTAP tests, just like a good DBA always wanted developers to have :)
+And there you have it. A complete suite of pgTAP tests, just what DBA's always wanted developers todo - DEVELOP TESTS :)
 
 # Copyright and License
 [MIT License](./LICENSE)
