@@ -154,6 +154,15 @@ If everything went well, but if something failed you should see something output
 
 And there you have it. A complete suite of pgTAP tests, just what DBA's always wanted developers todo - DEVELOP TESTS :)
 
+# Whats coming next?
+* Add a scrapper to get the pgTAP available tests from []()
+* Determine which code.src.writers are required and create them if they don't exist or replace them if the syntax has changed
+* Determine which code.src.getters are required and create them if they don't exist or replace them if the syntax has changed
+* Determine which code.src.module_types they belong to and create new module_types or update existing module_types
+* I'm sure I'll think of more at some point
+
+Just as an FYI here. I have no idea how I'm going to acheive that, but I'm going to give it my best shot. So don't hold your breath for those releases, it may take a while :)
+
 # Copyright and License
 [MIT License](./LICENSE)
 
