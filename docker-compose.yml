@@ -25,7 +25,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./db/pgtapme/conf.d:/etc/postgresql/conf.d
+      - ./db/conf.d:/etc/postgresql/conf.d
 
   sqitch:
     image: sqitch/sqitch
@@ -34,9 +34,8 @@ services:
       - ./sqitch/.sqitch/sqitch.conf:/home/.sqitch/sqitch.conf
       - ./sqitch/.sqitch/.pgpass:/home/.pgpass:ro
       - ./sqitch/sqitch.sh:/home/sqitch.sh
-      - ./sqitch/sqitch.conf:/mnt/sqitch/sqitch.conf
-      - ./sqitch/projects/:/mnt/sqitch/
-    working_dir: /mnt/sqitch
+      - ./sqitch/migrations/:/mnt/migrations/
+    working_dir: /mnt/migrations
     entrypoint: /bin/bash
     command: -c "tail -f /dev/null"
     depends_on:
@@ -47,6 +46,7 @@ services:
     volumes:
       - ./pg_prove/pg_prove.sh:/mnt/pg_prove/pg_prove.sh
       - ./pg_prove/projects/:/mnt/tests/
+    working_dir: /mnt/tests
     entrypoint: /bin/sh
     command: -c "tail -f /dev/null"
     depends_on:
