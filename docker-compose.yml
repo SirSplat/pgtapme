@@ -32,7 +32,7 @@ services:
     user: sqitch
     volumes:
       - ./sqitch/.sqitch/sqitch.conf:/home/.sqitch/sqitch.conf
-      - ./sqitch/.sqitch/.pgpass:/home/.pgpass:ro
+      - ./.pgpass:/home/.pgpass:ro
       - ./sqitch/sqitch.sh:/home/sqitch.sh
       - ./sqitch/migrations/:/mnt/migrations/
       - ./sqitch/migrations/sqitch.conf:/mnt/migrations/sqitch.conf
@@ -45,8 +45,9 @@ services:
   pg_prove:
     image: itheory/pg_prove
     volumes:
-      - ./pg_prove/pg_prove.sh:/home/pg_prove.sh
-      - ../code/pgtapme_generated_files:/mnt/tests/
+      - ./.pgpass:/root/.pgpass:ro
+      - ./pg_prove/pg_prove.sh:/root/pg_prove.sh
+      - ./code/pgtapme_generated_files:/mnt/tests/
     working_dir: /mnt/tests
     entrypoint: /bin/sh
     command: -c "tail -f /dev/null"

@@ -102,11 +102,63 @@ By default pgtapme.py does not produce output, unless something went wrong or yo
 
 ## Testing pgtapme.py output, does it match our sqitch deployed database
 
-    docker 
+    docker compose exec -it pg_prove pg_prove --ext .sql -r -U dbo -h pgtapme_db -d pgtapme -p 5432 -f /mnt/tests/pgtapme
+
+This should produce output similar to:
+
+    /mnt/tests/pgtapme/cluster/cluster.sql ............................................................................................................................ ok
+    /mnt/tests/pgtapme/cluster/language/c.sql ......................................................................................................................... ok
+    /mnt/tests/pgtapme/cluster/language/internal.sql .................................................................................................................. ok
+    /mnt/tests/pgtapme/cluster/language/plpgsql.sql ................................................................................................................... ok
+    /mnt/tests/pgtapme/cluster/language/sql.sql ....................................................................................................................... ok
+    /mnt/tests/pgtapme/cluster/role/dbo.sql ........................................................................................................................... ok
+    /mnt/tests/pgtapme/cluster/role/pg_checkpoint.sql ................................................................................................................. ok
+    /mnt/tests/pgtapme/cluster/role/pg_create_subscription.sql ........................................................................................................ ok
+    /mnt/tests/pgtapme/cluster/role/pg_database_owner.sql ............................................................................................................. ok
+    /mnt/tests/pgtapme/cluster/role/pg_execute_server_program.sql ..................................................................................................... ok
+    .
+    .
+    .
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/sqitch/tables/tags/indexes/tags_pkey.sql ............................................................................. ok
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/sqitch/tables/tags/indexes/tags_project_tag_key.sql .................................................................. ok
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/sqitch/tables/tags/tags.sql .......................................................................................... ok
+    All tests successful.
+    Files=2479, Tests=26589, 79 wallclock secs ( 3.91 usr  2.35 sys + 44.79 cusr  5.05 csys = 56.10 CPU)
+    Result: PASS
+
+If everything went well, but if something failed you should see something output similar to:
+
+    .
+    .
+    .
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_dow/indexes/lkp_dow_short_name_ic_uidx.sql ........................................................ ok
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_dow/lkp_dow.sql ................................................................................... 1/20
+    <p style='color:red'>not ok 6 - Table pgtapme.lkp_dow should have the correct columns.</p>
+    # Failed test 6: "Table pgtapme.lkp_dow should have the correct columns."
+    #     Extra columns:
+    #         ive_broken_it
+    # Looks like you failed 1 test of 20
+    <p style='color:red'>/mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_dow/lkp_dow.sql ................................................................................... Failed 1/20 subtests</p>
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_mth/columns/fk.sql ................................................................................ ok
+    .
+    .
+    .
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/sqitch/tables/tags/indexes/tags_pkey.sql ............................................................................. ok
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/sqitch/tables/tags/indexes/tags_project_tag_key.sql .................................................................. ok
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/sqitch/tables/tags/tags.sql .......................................................................................... ok
+
+    Test Summary Report
+    -------------------
+    <p style='color:red'>/mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_dow/lkp_dow.sql                                                                                 (Wstat: 0 Tests: 20 Failed: 1)
+      Failed test:  6</p>
+    Files=2479, Tests=26589, 79 wallclock secs ( 4.09 usr  2.30 sys + 44.94 cusr  5.06 csys = 56.39 CPU)
+    Result: FAIL
+
+And there you have it.
 
 # Copyright and License
 
-Copyright © 2019-2024 Leon Rogers. Some rights reserved.
+Copyright © 2024 Leon Rogers. Some rights reserved.
 
 Permission to use, copy, modify, and distribute this software and its documentation for any purpose, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and this paragraph and the following two paragraphs appear in all copies.
 

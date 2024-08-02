@@ -16,7 +16,7 @@ do
 done
 
 docker run -it --rm --network host \
-    --platform linux/amd64 \
-    --mount "type=bind,src=../code/pgtapme_generated_files,dst=/repo" \
+    --platform linux/arm64 \
+    --mount "type=bind,src=$(pwd)/code/pgtapme_generated_files,dst=/repo" \
     --mount "type=bind,src=$HOME,dst=/root" \
     "${passenv[@]}" "$PGPROVE_IMAGE"  $@
