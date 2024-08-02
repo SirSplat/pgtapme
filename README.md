@@ -133,12 +133,12 @@ If everything went well, but if something failed you should see something output
     .
     /mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_dow/indexes/lkp_dow_short_name_ic_uidx.sql ........................................................ ok
     /mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_dow/lkp_dow.sql ................................................................................... 1/20
-    <p style='color:red'>not ok 6 - Table pgtapme.lkp_dow should have the correct columns.</p>
+    not ok 6 - Table pgtapme.lkp_dow should have the correct columns.
     # Failed test 6: "Table pgtapme.lkp_dow should have the correct columns."
     #     Extra columns:
     #         ive_broken_it
     # Looks like you failed 1 test of 20
-    <p style='color:red'>/mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_dow/lkp_dow.sql ................................................................................... Failed 1/20 subtests</p>
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_dow/lkp_dow.sql ................................................................................... Failed 1/20 subtests
     /mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_mth/columns/fk.sql ................................................................................ ok
     .
     .
@@ -149,8 +149,8 @@ If everything went well, but if something failed you should see something output
 
     Test Summary Report
     -------------------
-    <p style='color:red'>/mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_dow/lkp_dow.sql                                                                                 (Wstat: 0 Tests: 20 Failed: 1)
-      Failed test:  6</p>
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_dow/lkp_dow.sql                                                                                 (Wstat: 0 Tests: 20 Failed: 1)
+    Failed test:  6
     Files=2479, Tests=26589, 79 wallclock secs ( 4.09 usr  2.30 sys + 44.94 cusr  5.06 csys = 56.39 CPU)
     Result: FAIL
 
