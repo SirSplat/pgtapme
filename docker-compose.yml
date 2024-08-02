@@ -45,7 +45,7 @@ services:
   pg_prove:
     image: itheory/pg_prove
     volumes:
-      - ./pg_prove/pg_prove.sh:/mnt/pg_prove/pg_prove.sh
+      - ./pg_prove/pg_prove.sh:/home/pg_prove.sh
       - ../code/pgtapme_generated_files:/mnt/tests/
     working_dir: /mnt/tests
     entrypoint: /bin/sh

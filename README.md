@@ -100,6 +100,10 @@ The output of this is:
 
 By default pgtapme.py does not produce output, unless something went wrong or you passed the --log-level argument
 
+## Testing pgtapme.py output, does it match our sqitch deployed database
+
+    docker 
+
 # Copyright and License
 
 Copyright © 2019-2024 Leon Rogers. Some rights reserved.
