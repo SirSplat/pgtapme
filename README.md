@@ -1,14 +1,12 @@
 # What is this
-PGtapme is a [Python](https://www.python.org/) tool for generating [pgTAP](https://pgtap.org/) style tests using a [PostgreSQl](https://www.postgresql.org/) database. It provides a modular and extensible framework to create tests for different aspects of your database schema. These tests can then be executed using [pg_prove docker image](https://hub.docker.com/r/itheory/pg_prove/).
-
-<!-- # <p style='color:red'>***This is still very much a work in progress - USE AT YOUR OWN RISK***</p> -->
+PGtapme is an application written in [Python](https://www.python.org/) for generating [pgTAP](https://pgtap.org/) style tests using a [PostgreSQl](https://www.postgresql.org/) database. It provides a modular and extensible framework to create tests for different aspects of your database schema. These tests can then be executed using [pg_prove docker image](https://hub.docker.com/r/itheory/pg_prove/).
 
 # Why do this - re-invent the wheel?
 I did this to for a few reasons:
 * To learn [Python](https://www.python.org/)
 * But more so to learn the intricacies of [pgTAP](https://pgtap.org/) (inside [PostgreSQL](https://www.postgresql.org/), not the [Perl](https://www.perl.org/) code)
 * I don't like the output format [pg_tapgen](https://github.com/theory/tap-parser-sourcehandler-pgtap/blob/v3.36/bin/pg_tapgen) produces
-* So I had to learn [pgTAP]() and [pg_prove]() Perl code anyway :)
+* So I had to learn [pgTAP](https://github.com/theory/tap-parser-sourcehandler-pgtap) and [pg_prove](https://github.com/theory/tap-parser-sourcehandler-pgtap) Perl code anyway :)
 
 # How to use this
 ## Start the cluster
@@ -154,7 +152,7 @@ If everything went well, but if something failed you should see something output
     Files=2479, Tests=26589, 79 wallclock secs ( 4.09 usr  2.30 sys + 44.94 cusr  5.06 csys = 56.39 CPU)
     Result: FAIL
 
-And there you have it.
+And there you have it. A complete suite of pgTAP tests, just like a good DBA always wanted developers to have :)
 
 # Copyright and License
 [MIT License](./LICENSE)
