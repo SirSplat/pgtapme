@@ -46,7 +46,7 @@ services:
     image: itheory/pg_prove
     volumes:
       - ./pg_prove/pg_prove.sh:/mnt/pg_prove/pg_prove.sh
-      - ./pg_prove/projects/:/mnt/tests/
+      - ../code/pgtapme_generated_files:/mnt/tests/
     working_dir: /mnt/tests
     entrypoint: /bin/sh
     command: -c "tail -f /dev/null"
