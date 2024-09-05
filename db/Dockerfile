@@ -1,4 +1,4 @@
-FROM sirsplat/postgresql-pgtap:latest
+FROM sirsplat/database:latest
 
 # Set the working directory
 WORKDIR /code
