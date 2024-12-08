@@ -1,12 +1,12 @@
 # What is this
-PGtapme is an application written in [Python](https://www.python.org/) for generating [pgTAP](https://pgtap.org/) style tests using a [PostgreSQL](https://www.postgresql.org/) database. It provides a modular and extensible framework to create tests for different aspects of your database schema. These tests can then be executed using [pg_prove docker image](https://hub.docker.com/r/itheory/pg_prove/).
+pgTAPme is an application written in [Python](https://www.python.org/) which generates [pgTAP](https://pgtap.org/) style tests using a [PostgreSQL](https://www.postgresql.org/) database. It provides a modular and extensible framework to create tests for different aspects of your database schema. These tests can then be executed using the [pg_prove docker image](https://hub.docker.com/r/itheory/pg_prove/).
 
-# Why do this - re-invent the wheel?
+# Why do this (re-invent the wheel)?
 I did this to for a few reasons:
 * To learn [Python](https://www.python.org/)
 * But more so to learn the intricacies of [pgTAP](https://pgtap.org/) (inside [PostgreSQL](https://www.postgresql.org/), not the [Perl](https://www.perl.org/) code)
 * I don't like the output format [pg_tapgen](https://github.com/theory/tap-parser-sourcehandler-pgtap/blob/v3.36/bin/pg_tapgen) produces
-* So I had to learn [pgTAP](https://github.com/theory/tap-parser-sourcehandler-pgtap) and [pg_prove](https://github.com/theory/tap-parser-sourcehandler-pgtap) Perl code anyway :)
+* So I had to learn [pgTAP](https://github.com/theory/tap-parser-sourcehandler-pgtap) and [pg_prove](https://github.com/theory/tap-parser-sourcehandler-pgtap) Perl code anyway :) Learned a lot.
 
 # How to use this
 ## Start the cluster
@@ -111,7 +111,7 @@ This should produce output similar to:
     /mnt/tests/pgtapme/databases/pgtapme/schemas/sqitch/tables/tags/indexes/tags_project_tag_key.sql .................................................................. ok
     /mnt/tests/pgtapme/databases/pgtapme/schemas/sqitch/tables/tags/tags.sql .......................................................................................... ok
     All tests successful.
-    Files=2479, Tests=26589, 79 wallclock secs ( 3.91 usr  2.35 sys + 44.79 cusr  5.05 csys = 56.10 CPU)
+    Files=2520, Tests=27102, 85 wallclock secs ( 4.34 usr  2.14 sys + 50.08 cusr  5.31 csys = 61.87 CPU)
     Result: PASS
 
 If everything went well, but if something failed you should see something output similar to:
@@ -142,7 +142,9 @@ If everything went well, but if something failed you should see something output
     Files=2479, Tests=26589, 79 wallclock secs ( 4.09 usr  2.30 sys + 44.94 cusr  5.06 csys = 56.39 CPU)
     Result: FAIL
 
-And there you have it. A complete suite of pgTAP tests, just what DBA's always wanted developers todo - DEVELOP DATABAE DDL TESTS :)
+And there you have it. A complete suite of pgTAP tests, just what DBA's always wanted developers todo - DEVELOP DATABASE SCHEMA TESTS :)
+
+I've provided the original [pgtapme-v1.0.tgz](pg_prove/pgtapme-v1.0.tgz) for reference.
 
 # Whats coming next?
 * Add a scraper to get the pgTAP available tests from []()
