@@ -8,4 +8,4 @@ src/getters/__pycache__/
 .vscode
 .pytest_cache
 pgtapme_generated_files
-pg_prove/tests
+pgtap_webpage.html
