@@ -7,5 +7,4 @@ src/getters/__pycache__/
 *.pyd
 .vscode
 .pytest_cache
-pgtapme_generated_files
-code/pgtap_webpage.html
+code/pgtapme_generated_files
