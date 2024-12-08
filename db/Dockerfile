@@ -4,7 +4,7 @@ FROM sirsplat/postgresql:latest
 WORKDIR /code
 
 # Copy initialization script
-COPY ./initdb.sh ./b_initdb.sh
+COPY ./initdb.sh /docker-entrypoint-initdb.d/b_initdb.sh
 
 # Set the user to postgres, required to comply with scout "Default non-root User" policy
 USER postgres

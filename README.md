@@ -13,16 +13,6 @@ I did this to for a few reasons:
 
     docker compose up -d
 
-## Create the pgtapme database
-
-    docker compose exec pgtapme_db bash /code/initdb.sh
-
- This will produce output simiar to:
-
-    CREATE DATABASE
-    COMMENT
-    ALTER DATABASE
-
 ## Initialize the pgtapme database, lets first try get the status
 
     docker compose exec -it sqitch sqitch status pgtapme --chdir /mnt/migrations
@@ -94,7 +84,7 @@ The output of this is:
 
 ## So lets create the pgTAP style tests for our pgtapme database
 
-    docker compose exec -it app python pgtapme.py --help
+    docker compose exec -it app python pgtapme.py
 
 By default pgtapme.py does not produce output, unless something went wrong or you passed the --log-level argument
 
@@ -152,10 +142,10 @@ If everything went well, but if something failed you should see something output
     Files=2479, Tests=26589, 79 wallclock secs ( 4.09 usr  2.30 sys + 44.94 cusr  5.06 csys = 56.39 CPU)
     Result: FAIL
 
-And there you have it. A complete suite of pgTAP tests, just what DBA's always wanted developers todo - DEVELOP TESTS :)
+And there you have it. A complete suite of pgTAP tests, just what DBA's always wanted developers todo - DEVELOP DATABAE DDL TESTS :)
 
 # Whats coming next?
-* Add a scrapper to get the pgTAP available tests from []()
+* Add a scraper to get the pgTAP available tests from []()
 * Determine which code.src.writers are required and create them if they don't exist or replace them if the syntax has changed
 * Determine which code.src.getters are required and create them if they don't exist or replace them if the syntax has changed
 * Determine which code.src.module_types they belong to and create new module_types or update existing module_types
