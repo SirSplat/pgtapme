@@ -1,5 +1,5 @@
 # What is this
-PGtapme is an application written in [Python](https://www.python.org/) for generating [pgTAP](https://pgtap.org/) style tests using a [PostgreSQl](https://www.postgresql.org/) database. It provides a modular and extensible framework to create tests for different aspects of your database schema. These tests can then be executed using [pg_prove docker image](https://hub.docker.com/r/itheory/pg_prove/).
+PGtapme is an application written in [Python](https://www.python.org/) for generating [pgTAP](https://pgtap.org/) style tests using a [PostgreSQL](https://www.postgresql.org/) database. It provides a modular and extensible framework to create tests for different aspects of your database schema. These tests can then be executed using [pg_prove docker image](https://hub.docker.com/r/itheory/pg_prove/).
 
 # Why do this - re-invent the wheel?
 I did this to for a few reasons:
