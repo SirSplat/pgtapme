@@ -2,6 +2,7 @@ import argparse
 import inspect
 import logging
 import os
+import re
 from functools import wraps
 
 import psycopg2
@@ -9,7 +10,7 @@ from dotenv import load_dotenv
 
 
 def parse_command_line_args():
-    logging.debug("Parsing command-lins arguments.")
+    logging.debug("Parsing command-line arguments.")
 
     """
     Parse command-line arguments for logging and module type configuration.
@@ -71,7 +72,7 @@ def override_module_type(config, module_type):
         logging.debug("No module type overide provided.")
 
 
-def get_modules(config):
+def get_modules(config, args):
     logging.debug("Retrieving module types from configuration.")
 
     """
@@ -79,12 +80,11 @@ def get_modules(config):
 
     Args:
         config (dict): The configuration dictionary.
+        args (argparse.Namespace): Parsed command-line arguments.
 
     Returns:
         list: A list of module types.
     """
-    args = parse_command_line_args()
-    configure_logging_from_args(args)
     override_module_type(config, args.module_type)
     modules = config.get("module_types", [])
 
@@ -93,10 +93,10 @@ def get_modules(config):
     return modules
 
 
-def configure_logging():
+def configure_logging(args):
     logging.debug("Configuring logging.")
 
-    args = parse_command_line_args()
+    """Configure application logging based on parsed CLI arguments."""
 
     # Configure logging based on the command line argument if provided.
     # If --log-level argument is not provided, keep the default level as WARNING.
@@ -115,6 +115,13 @@ def configure_logging_from_args(args):
     # Get the root logger
     root_logger = logging.getLogger()
 
+    if not root_logger.handlers:
+        logging.basicConfig(
+            level=logging.WARNING,
+            format="%(asctime)s %(levelname)s : %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+
     # Check if --log-level argument is provided
     if hasattr(args, "log_level") and args.log_level:
         # Set the logging level for the root logger
@@ -122,13 +129,6 @@ def configure_logging_from_args(args):
 
         logging.debug(f"Logging level set to: {args.log_level}")
     else:
-        # Use the default logging configuration
-        logging.basicConfig(
-            level=logging.WARNING,
-            format="%(asctime)s %(levelname)s : %(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S",
-        )
-
         logging.debug("Default logging configuration applied with level: WARNING")
 
 
@@ -250,6 +250,9 @@ def create_file_path(output_dir, *parts):
         raise
 
 
+PLAN_PATTERN = re.compile(r"^(?P<indent>\s*SELECT\s+plan\()\d+(?P<suffix>\);\s*)$", re.MULTILINE)
+
+
 @log_function_call
 def replace_test_count(file_path, test_count):
     try:
@@ -260,12 +263,18 @@ def replace_test_count(file_path, test_count):
 
         logging.debug(f"Replacing test count in file: {file_path}")
 
-        content = content.replace(f"(0)", f"({test_count})")
+        updated_content, replacements = PLAN_PATTERN.subn(
+            f"\\g<indent>{test_count}\\g<suffix>", content
+        )
+
+        if replacements == 0:
+            logging.error("No plan() statement found to update.")
+            raise ValueError("No plan() statement found to update.")
 
         logging.debug(f"Writing updated content to file: {file_path}")
 
         with open(file_path, "w") as f:
-            f.write(content)
+            f.write(updated_content)
 
         logging.debug(f"Successfully replaced test count in file: {file_path}")
     except Exception as e:
@@ -274,24 +283,25 @@ def replace_test_count(file_path, test_count):
         raise
 
 
+ASSERTION_PATTERN = re.compile(
+    r"^\s*SELECT\s+(?!plan\(|\*\s+FROM\s+finish\()",
+    re.IGNORECASE,
+)
+
+
 @log_function_call
 def count_tests_in_file(file_path):
-    word = "SELECT"
     count = 0
     try:
-        logging.debug(f"Counting occurrences of '{word}' in file: {file_path}")
+        logging.debug(f"Counting assertions in file: {file_path}")
 
         with open(file_path, "r") as f:
             for line in f:
-                count += line.split().count(word)
+                if ASSERTION_PATTERN.search(line):
+                    count += 1
 
-        # Subtracting 2 to exclude the "SELECT plan(?);" and "SELECT * FROM finish();"
-        test_count = count - 2
-
-        logging.debug(
-            f"Total test count in file (excluding plan and finish): {test_count}"
-        )
-        return test_count
+        logging.debug(f"Total pgTAP assertions in file: {count}")
+        return count
     except Exception as e:
         logging.error(f"Failed to count tests in file {file_path}: {e}")
         raise
@@ -311,9 +321,9 @@ def set_plan_count(test_file_path):
 
 
 @log_function_call
-def connect_to_database():
+def connect_to_database(args):
+    """Connect to the database using command-line arguments or environment defaults."""
     load_dotenv()
-    args = parse_command_line_args()
 
     # Use command-line arguments if provided, otherwise fall back to .env variables
     database_name = args.database_name or os.getenv("DATABASE_NAME")
