@@ -99,12 +99,22 @@ jobs:
           name: docker-compose-logs
           path: docker-compose.log
 
+      - name: Archive generated pgTAP files
+        if: always()
+        run: |
+          if [ -d code/pgtapme_generated_files ] && [ "$(find code/pgtapme_generated_files -type f | head -n1)" ]; then
+            tar -czf pgtapme-generated-tests.tar.gz -C code pgtapme_generated_files
+          else
+            echo "No generated pgTAP files found; uploading empty archive"
+            tar -czf pgtapme-generated-tests.tar.gz --files-from /dev/null
+          fi
+
       - name: Upload generated pgTAP files
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pgtapme-generated-tests
-          path: code/pgtapme_generated_files
+          path: pgtapme-generated-tests.tar.gz
           if-no-files-found: warn
 
       - name: Tear down services
