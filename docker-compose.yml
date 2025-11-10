@@ -20,7 +20,7 @@ services:
       dockerfile: Dockerfile
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_PASSWORD: ${PGTAPME_DB_PASSWORD:-mysecretpassword}
       POSTGRES_DB: postgres
     user: postgres
     ports:
