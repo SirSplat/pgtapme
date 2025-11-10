@@ -1,8 +1,41 @@
 import logging
 from io import TextIOWrapper
-from typing import List, Optional
+from typing import Dict, Iterable, List, Optional
 
 from src.helpers import format_array_parameter, log_function_call
+
+
+def _format_scalar(value) -> str:
+    if value is None:
+        return "NULL"
+
+    escaped = str(value).replace("'", "''")
+    return f"'{escaped}'"
+
+
+def _write_assertion(
+    f: TextIOWrapper,
+    function_name: str,
+    description_template: str,
+    args: List,
+    array_indexes: Iterable[int],
+    description_context: Optional[Dict[str, str]] = None,
+) -> None:
+    description_context = description_context or {}
+    description = description_template.format(**description_context)
+
+    formatted_args = []
+    for index, value in enumerate(args):
+        if index in array_indexes:
+            formatted_args.append(format_array_parameter(value))
+        else:
+            formatted_args.append(_format_scalar(value))
+
+    formatted_args.append(_format_scalar(description))
+
+    f.write(
+        f"  SELECT {function_name}({', '.join(formatted_args)});\n\n"
+    )
 
 
 @log_function_call
@@ -63,9 +96,12 @@ def write_languages_are(f: TextIOWrapper, languages_are: str) -> None:
     logging.debug(
         f"Writing languages_are statement to file: {f.name} with languages: {languages_are}"
     )
-    array_str = format_array_parameter(languages_are)
-    f.write(
-        f"  SELECT languages_are( {array_str}, 'Cluster should have the correct languages.');\n\n"
+    _write_assertion(
+        f,
+        "languages_are",
+        "Cluster should have the correct languages.",
+        args=[languages_are],
+        array_indexes={0},
     )
     logging.debug("languages_are statement written successfully.")
 
@@ -75,9 +111,12 @@ def write_tablespaces_are(f: TextIOWrapper, tablespaces_are: str) -> None:
     logging.debug(
         f"Writing tablespaces_are statement to file: {f.name} with tablespaces: {tablespaces_are}"
     )
-    array_str = format_array_parameter(tablespaces_are)
-    f.write(
-        f"  SELECT tablespaces_are( {array_str}, 'Cluster should have the correct tablespaces.');\n\n"
+    _write_assertion(
+        f,
+        "tablespaces_are",
+        "Cluster should have the correct tablespaces.",
+        args=[tablespaces_are],
+        array_indexes={0},
     )
     logging.debug("tablespaces_are statement written successfully.")
 
@@ -87,9 +126,12 @@ def write_roles_are(f: TextIOWrapper, roles_are: str) -> None:
     logging.debug(
         f"Writing roles_are statement to file: {f.name} with roles: {roles_are}"
     )
-    array_str = format_array_parameter(roles_are)
-    f.write(
-        f"  SELECT roles_are( {array_str}, 'Cluster should have the correct roles.');\n\n"
+    _write_assertion(
+        f,
+        "roles_are",
+        "Cluster should have the correct roles.",
+        args=[roles_are],
+        array_indexes={0},
     )
     logging.debug("roles_are statement written successfully.")
 
@@ -99,42 +141,59 @@ def write_groups_are(f: TextIOWrapper, groups_are: str) -> None:
     logging.debug(
         f"Writing groups_are statement to file: {f.name} with groups: {groups_are}"
     )
-    array_str = format_array_parameter(groups_are)
-    f.write(
-        f"  SELECT groups_are( {array_str}, 'Cluster should have the correct groups.');\n\n"
+    _write_assertion(
+        f,
+        "groups_are",
+        "Cluster should have the correct groups.",
+        args=[groups_are],
+        array_indexes={0},
     )
     logging.debug("groups_are statement written successfully.")
 
 
 @log_function_call
 def write_users_are(f: TextIOWrapper, users_are: str) -> None:
-    array_str = format_array_parameter(users_are)
-    f.write(
-        f"  SELECT users_are( {array_str}, 'Cluster should have the correct users.');\n\n"
+    _write_assertion(
+        f,
+        "users_are",
+        "Cluster should have the correct users.",
+        args=[users_are],
+        array_indexes={0},
     )
 
 
 @log_function_call
 def write_casts_are(f: TextIOWrapper, casts_are: str) -> None:
-    array_str = format_array_parameter(casts_are)
-    f.write(
-        f"  SELECT casts_are( {array_str}, 'Cluster should have the correct casts.');\n\n"
+    _write_assertion(
+        f,
+        "casts_are",
+        "Cluster should have the correct casts.",
+        args=[casts_are],
+        array_indexes={0},
     )
 
 
 @log_function_call
 def write_schemas_are(f: TextIOWrapper, database_name: str, schema_names: str) -> None:
-    array_str = format_array_parameter(schema_names)
-    f.write(
-        f"  SELECT schemas_are( {array_str}, 'Database {database_name} should have the correct schemas.');\n\n"
+    _write_assertion(
+        f,
+        "schemas_are",
+        "Database {database_name} should have the correct schemas.",
+        args=[schema_names],
+        array_indexes={0},
+        description_context={"database_name": database_name},
     )
 
 
 @log_function_call
 def write_tables_are(f: TextIOWrapper, schema_name: str, tables_are: str) -> None:
-    array_str = format_array_parameter(tables_are)
-    f.write(
-        f"  SELECT tables_are('{schema_name}', {array_str}, 'Schema {schema_name} should have the correct tables.');\n\n"
+    _write_assertion(
+        f,
+        "tables_are",
+        "Schema {schema_name} should have the correct tables.",
+        args=[schema_name, tables_are],
+        array_indexes={1},
+        description_context={"schema_name": schema_name},
     )
 
 
@@ -142,17 +201,25 @@ def write_tables_are(f: TextIOWrapper, schema_name: str, tables_are: str) -> Non
 def write_foreign_tables_are(
     f: TextIOWrapper, schema_name: str, foreign_tables_are: str
 ) -> None:
-    array_str = format_array_parameter(foreign_tables_are)
-    f.write(
-        f"  SELECT foreign_tables_are('{schema_name}', {array_str}, 'Schema {schema_name} should have the correct foreign tables.');\n\n"
+    _write_assertion(
+        f,
+        "foreign_tables_are",
+        "Schema {schema_name} should have the correct foreign tables.",
+        args=[schema_name, foreign_tables_are],
+        array_indexes={1},
+        description_context={"schema_name": schema_name},
     )
 
 
 @log_function_call
 def write_views_are(f: TextIOWrapper, schema_name: str, views_are: str) -> None:
-    array_str = format_array_parameter(views_are)
-    f.write(
-        f"  SELECT views_are('{schema_name}', {array_str}, 'Schema {schema_name} should have the correct views.');\n\n"
+    _write_assertion(
+        f,
+        "views_are",
+        "Schema {schema_name} should have the correct views.",
+        args=[schema_name, views_are],
+        array_indexes={1},
+        description_context={"schema_name": schema_name},
     )
 
 
@@ -160,65 +227,97 @@ def write_views_are(f: TextIOWrapper, schema_name: str, views_are: str) -> None:
 def write_materialized_views_are(
     f: TextIOWrapper, schema_name: str, materialized_views_are: str
 ) -> None:
-    array_str = format_array_parameter(materialized_views_are)
-    f.write(
-        f"  SELECT materialized_views_are('{schema_name}', {array_str}, 'Schema {schema_name} should have the correct materialized views.');\n\n"
+    _write_assertion(
+        f,
+        "materialized_views_are",
+        "Schema {schema_name} should have the correct materialized views.",
+        args=[schema_name, materialized_views_are],
+        array_indexes={1},
+        description_context={"schema_name": schema_name},
     )
 
 
 @log_function_call
 def write_sequences_are(f: TextIOWrapper, schema_name: str, sequences_are: str) -> None:
-    array_str = format_array_parameter(sequences_are)
-    f.write(
-        f"  SELECT sequences_are('{schema_name}', {array_str}, 'Schema {schema_name} should have the correct sequences.');\n\n"
+    _write_assertion(
+        f,
+        "sequences_are",
+        "Schema {schema_name} should have the correct sequences.",
+        args=[schema_name, sequences_are],
+        array_indexes={1},
+        description_context={"schema_name": schema_name},
     )
 
 
 @log_function_call
 def write_functions_are(f: TextIOWrapper, schema_name: str, functions_are: str) -> None:
-    array_str = format_array_parameter(functions_are)
-    f.write(
-        f"  SELECT functions_are('{schema_name}', {array_str}, 'Schema {schema_name} should have the correct functions.');\n\n"
+    _write_assertion(
+        f,
+        "functions_are",
+        "Schema {schema_name} should have the correct functions.",
+        args=[schema_name, functions_are],
+        array_indexes={1},
+        description_context={"schema_name": schema_name},
     )
 
 
 @log_function_call
 def write_opclasses_are(f: TextIOWrapper, schema_name: str, opclasses_are: str) -> None:
-    array_str = format_array_parameter(opclasses_are)
-    f.write(
-        f"  SELECT opclasses_are('{schema_name}', {array_str}, 'Schema {schema_name} should have the correct opclasses.');\n\n"
+    _write_assertion(
+        f,
+        "opclasses_are",
+        "Schema {schema_name} should have the correct opclasses.",
+        args=[schema_name, opclasses_are],
+        array_indexes={1},
+        description_context={"schema_name": schema_name},
     )
 
 
 @log_function_call
 def write_types_are(f: TextIOWrapper, schema_name: str, types_are: str) -> None:
-    array_str = format_array_parameter(types_are)
-    f.write(
-        f"  SELECT types_are('{schema_name}', {array_str}, 'Schema {schema_name} should have the correct types.');\n\n"
+    _write_assertion(
+        f,
+        "types_are",
+        "Schema {schema_name} should have the correct types.",
+        args=[schema_name, types_are],
+        array_indexes={1},
+        description_context={"schema_name": schema_name},
     )
 
 
 @log_function_call
 def write_domains_are(f: TextIOWrapper, schema_name: str, domains_are: str) -> None:
-    array_str = format_array_parameter(domains_are)
-    f.write(
-        f"  SELECT domains_are('{schema_name}', {array_str}, 'Schema {schema_name} should have the correct domains.');\n\n"
+    _write_assertion(
+        f,
+        "domains_are",
+        "Schema {schema_name} should have the correct domains.",
+        args=[schema_name, domains_are],
+        array_indexes={1},
+        description_context={"schema_name": schema_name},
     )
 
 
 @log_function_call
 def write_enums_are(f: TextIOWrapper, schema_name: str, enums_are: str) -> None:
-    array_str = format_array_parameter(enums_are)
-    f.write(
-        f"  SELECT enums_are('{schema_name}', {array_str}, 'Schema {schema_name} should have the correct enums.');\n\n"
+    _write_assertion(
+        f,
+        "enums_are",
+        "Schema {schema_name} should have the correct enums.",
+        args=[schema_name, enums_are],
+        array_indexes={1},
+        description_context={"schema_name": schema_name},
     )
 
 
 @log_function_call
 def write_operators_are(f: TextIOWrapper, schema_name: str, operators_are: str) -> None:
-    array_str = format_array_parameter(operators_are)
-    f.write(
-        f"  SELECT operators_are('{schema_name}', {array_str}, 'Schema {schema_name} should have the correct operators.');\n\n"
+    _write_assertion(
+        f,
+        "operators_are",
+        "Schema {schema_name} should have the correct operators.",
+        args=[schema_name, operators_are],
+        array_indexes={1},
+        description_context={"schema_name": schema_name},
     )
 
 
@@ -239,9 +338,16 @@ def write_extensions_are(
 def write_partitions_are(
     f: TextIOWrapper, schema_name: str, table_name: str, partitions_are: List[str]
 ) -> None:
-    array_str = format_array_parameter(partitions_are)
-    f.write(
-        f"  SELECT partitions_are('{schema_name}', '{table_name}', {array_str}, 'Table {schema_name}.{table_name} should have the correct partitions.');\n\n"
+    _write_assertion(
+        f,
+        "partitions_are",
+        "Table {schema_name}.{table_name} should have the correct partitions.",
+        args=[schema_name, table_name, partitions_are],
+        array_indexes={2},
+        description_context={
+            "schema_name": schema_name,
+            "table_name": table_name,
+        },
     )
 
 
@@ -249,9 +355,16 @@ def write_partitions_are(
 def write_columns_are(
     f: TextIOWrapper, schema_name: str, table_name: str, columns_are: List[str]
 ) -> None:
-    array_str = format_array_parameter(columns_are)
-    f.write(
-        f"  SELECT columns_are('{schema_name}', '{table_name}', {array_str}, 'Table {schema_name}.{table_name} should have the correct columns.');\n\n"
+    _write_assertion(
+        f,
+        "columns_are",
+        "Table {schema_name}.{table_name} should have the correct columns.",
+        args=[schema_name, table_name, columns_are],
+        array_indexes={2},
+        description_context={
+            "schema_name": schema_name,
+            "table_name": table_name,
+        },
     )
 
 
@@ -259,9 +372,16 @@ def write_columns_are(
 def write_indexes_are(
     f: TextIOWrapper, schema_name: str, table_name: str, indexes_are: List[str]
 ) -> None:
-    array_str = format_array_parameter(indexes_are)
-    f.write(
-        f"  SELECT indexes_are('{schema_name}', '{table_name}', {array_str}, 'Table {schema_name}.{table_name} should have the correct indexes.');\n\n"
+    _write_assertion(
+        f,
+        "indexes_are",
+        "Table {schema_name}.{table_name} should have the correct indexes.",
+        args=[schema_name, table_name, indexes_are],
+        array_indexes={2},
+        description_context={
+            "schema_name": schema_name,
+            "table_name": table_name,
+        },
     )
 
 
@@ -269,9 +389,16 @@ def write_indexes_are(
 def write_triggers_are(
     f: TextIOWrapper, schema_name: str, table_name: str, triggers_are: List[str]
 ) -> None:
-    array_str = format_array_parameter(triggers_are)
-    f.write(
-        f"  SELECT triggers_are('{schema_name}', '{table_name}', {array_str}, 'Table {schema_name}.{table_name} should have the correct triggers.');\n\n"
+    _write_assertion(
+        f,
+        "triggers_are",
+        "Table {schema_name}.{table_name} should have the correct triggers.",
+        args=[schema_name, table_name, triggers_are],
+        array_indexes={2},
+        description_context={
+            "schema_name": schema_name,
+            "table_name": table_name,
+        },
     )
 
 
@@ -279,37 +406,64 @@ def write_triggers_are(
 def write_rules_are(
     f: TextIOWrapper, schema_name: str, table_name: str, rules_are: List[str]
 ) -> None:
-    array_str = format_array_parameter(rules_are)
-    f.write(
-        f"  SELECT rules_are('{schema_name}', '{table_name}', {array_str}, 'Table {schema_name}.{table_name} should have the correct rules.');\n\n"
+    _write_assertion(
+        f,
+        "rules_are",
+        "Table {schema_name}.{table_name} should have the correct rules.",
+        args=[schema_name, table_name, rules_are],
+        array_indexes={2},
+        description_context={
+            "schema_name": schema_name,
+            "table_name": table_name,
+        },
     )
 
 
 @log_function_call
 def write_db_owner_is(f: TextIOWrapper, database_name: str, owner_is: str) -> None:
-    f.write(
-        f"  SELECT db_owner_is('{database_name}', '{owner_is}', 'Database {database_name} should have the correct owner.');\n\n"
+    _write_assertion(
+        f,
+        "db_owner_is",
+        "Database {database_name} should have the correct owner.",
+        args=[database_name, owner_is],
+        array_indexes=set(),
+        description_context={"database_name": database_name},
     )
 
 
 @log_function_call
 def write_has_schema(f: TextIOWrapper, schema_name: str) -> None:
-    f.write(
-        f"  SELECT has_schema('{schema_name}', 'Schema {schema_name} should exist.');\n\n"
+    _write_assertion(
+        f,
+        "has_schema",
+        "Schema {schema_name} should exist.",
+        args=[schema_name],
+        array_indexes=set(),
+        description_context={"schema_name": schema_name},
     )
 
 
 @log_function_call
 def write_schema_owner_is(f: TextIOWrapper, schema_name: str, owner_is: str) -> None:
-    f.write(
-        f"  SELECT schema_owner_is('{schema_name}', '{owner_is}', 'Schema {schema_name} should have the correct owner.');\n\n"
+    _write_assertion(
+        f,
+        "schema_owner_is",
+        "Schema {schema_name} should have the correct owner.",
+        args=[schema_name, owner_is],
+        array_indexes=set(),
+        description_context={"schema_name": schema_name},
     )
 
 
 @log_function_call
 def write_has_language(f: TextIOWrapper, language_name: str) -> None:
-    f.write(
-        f"  SELECT has_language('{language_name}', 'Language {language_name} should exist.');\n\n"
+    _write_assertion(
+        f,
+        "has_language",
+        "Language {language_name} should exist.",
+        args=[language_name],
+        array_indexes=set(),
+        description_context={"language_name": language_name},
     )
 
 
@@ -317,15 +471,25 @@ def write_has_language(f: TextIOWrapper, language_name: str) -> None:
 def write_language_owner_is(
     f: TextIOWrapper, language_name: str, owner_is: str
 ) -> None:
-    f.write(
-        f"  SELECT language_owner_is('{language_name}', '{owner_is}', 'Language {language_name} should have the correct owner.');\n\n"
+    _write_assertion(
+        f,
+        "language_owner_is",
+        "Language {language_name} should have the correct owner.",
+        args=[language_name, owner_is],
+        array_indexes=set(),
+        description_context={"language_name": language_name},
     )
 
 
 @log_function_call
 def write_language_is_trusted(f: TextIOWrapper, language_name: str) -> None:
-    f.write(
-        f"  SELECT language_is_trusted('{language_name}', 'Language {language_name} should exist.');\n\n"
+    _write_assertion(
+        f,
+        "language_is_trusted",
+        "Language {language_name} should exist.",
+        args=[language_name],
+        array_indexes=set(),
+        description_context={"language_name": language_name},
     )
 
 
@@ -333,42 +497,75 @@ def write_language_is_trusted(f: TextIOWrapper, language_name: str) -> None:
 def write_tablespace_owner_is(
     f: TextIOWrapper, tablespace_name: str, owner_is: str
 ) -> None:
-    f.write(
-        f"  SELECT tablespace_owner_is('{tablespace_name}', '{owner_is}', 'Tablespace {tablespace_name} should have the correct owner.');\n\n"
+    _write_assertion(
+        f,
+        "tablespace_owner_is",
+        "Tablespace {tablespace_name} should have the correct owner.",
+        args=[tablespace_name, owner_is],
+        array_indexes=set(),
+        description_context={"tablespace_name": tablespace_name},
     )
 
 
 @log_function_call
 def write_has_tablespace(f: TextIOWrapper, tablespace_name: str) -> None:
-    f.write(
-        f"  SELECT has_tablespace('{tablespace_name}', 'Tablespace {tablespace_name} should exist.');\n\n"
+    _write_assertion(
+        f,
+        "has_tablespace",
+        "Tablespace {tablespace_name} should exist.",
+        args=[tablespace_name],
+        array_indexes=set(),
+        description_context={"tablespace_name": tablespace_name},
     )
 
 
 @log_function_call
 def write_has_role(f: TextIOWrapper, user_name: str) -> None:
-    f.write(f"  SELECT has_role('{user_name}', 'Role {user_name} should exist.');\n\n")
+    _write_assertion(
+        f,
+        "has_role",
+        "Role {user_name} should exist.",
+        args=[user_name],
+        array_indexes=set(),
+        description_context={"user_name": user_name},
+    )
 
 
 @log_function_call
 def write_has_group(f: TextIOWrapper, user_name: str) -> None:
-    f.write(
-        f"  SELECT has_group('{user_name}', 'Group {user_name} should exist.');\n\n"
+    _write_assertion(
+        f,
+        "has_group",
+        "Group {user_name} should exist.",
+        args=[user_name],
+        array_indexes=set(),
+        description_context={"user_name": user_name},
     )
 
 
 @log_function_call
 def write_has_user(f: TextIOWrapper, user_name: str) -> None:
-    f.write(f"  SELECT has_user('{user_name}', 'User {user_name} should exist.');\n\n")
+    _write_assertion(
+        f,
+        "has_user",
+        "User {user_name} should exist.",
+        args=[user_name],
+        array_indexes=set(),
+        description_context={"user_name": user_name},
+    )
 
 
 @log_function_call
 def write_is_member_of(
     f: TextIOWrapper, role_name: str, member_role_names: List[str]
 ) -> None:
-    array_str = format_array_parameter(member_role_names)
-    f.write(
-        f"  SELECT is_member_of('{role_name}', {array_str}, 'Role {role_name} should have the correct members.');\n\n"
+    _write_assertion(
+        f,
+        "is_member_of",
+        "Role {role_name} should have the correct members.",
+        args=[role_name, member_role_names],
+        array_indexes={1},
+        description_context={"role_name": role_name},
     )
 
 
@@ -376,23 +573,37 @@ def write_is_member_of(
 def write_isnt_member_of(
     f: TextIOWrapper, role_name: str, member_role_names: List[str]
 ) -> None:
-    array_str = format_array_parameter(member_role_names)
-    f.write(
-        f"  SELECT isnt_member_of('{role_name}', {array_str}, 'Role {role_name} should not have  members.');\n\n"
+    _write_assertion(
+        f,
+        "isnt_member_of",
+        "Role {role_name} should not have  members.",
+        args=[role_name, member_role_names],
+        array_indexes={1},
+        description_context={"role_name": role_name},
     )
 
 
 @log_function_call
 def write_isnt_superuser(f: TextIOWrapper, role_name: str) -> None:
-    f.write(
-        f"  SELECT isnt_superuser('{role_name}', 'Group {role_name} should not be a superuser.');\n\n"
+    _write_assertion(
+        f,
+        "isnt_superuser",
+        "Group {role_name} should not be a superuser.",
+        args=[role_name],
+        array_indexes=set(),
+        description_context={"role_name": role_name},
     )
 
 
 @log_function_call
 def write_is_superuser(f: TextIOWrapper, role_name: str) -> None:
-    f.write(
-        f"  SELECT is_superuser('{role_name}', 'Role {role_name} should be a superuser.');\n\n"
+    _write_assertion(
+        f,
+        "is_superuser",
+        "Role {role_name} should be a superuser.",
+        args=[role_name],
+        array_indexes=set(),
+        description_context={"role_name": role_name},
     )
 
 

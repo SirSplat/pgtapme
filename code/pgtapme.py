@@ -4,11 +4,17 @@ import os
 from importlib import import_module
 
 from psycopg2 import extras
-from src.helpers import configure_logging, connect_to_database, get_modules
+from src.helpers import (
+    configure_logging,
+    connect_to_database,
+    get_modules,
+    parse_command_line_args,
+)
 
 
 def main() -> None:
-    configure_logging()
+    args = parse_command_line_args()
+    configure_logging(args)
 
     logging.debug("Script started.")
 
@@ -34,7 +40,7 @@ def main() -> None:
         )
         return
 
-    conn, dbname = connect_to_database()
+    conn, dbname = connect_to_database(args)
 
     logging.debug(f"Connected to database: {dbname}")
 
@@ -44,7 +50,7 @@ def main() -> None:
     logging.debug(f"Output directory set to: {output_dir}")
     logging.debug(f"Starting reverse engineering of database: {dbname}")
 
-    module_types = get_modules(config)
+    module_types = get_modules(config, args)
 
     for module_type in module_types:
         logging.debug(f"Processing module: {module_type}")
