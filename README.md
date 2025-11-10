@@ -11,6 +11,15 @@ I did this to for a few reasons:
 # How to use this
 ## Start the cluster
 
+Before starting the containers ensure you have database credentials available to Docker. Copy the provided template and lock down its permissions:
+
+    cp .pgpass.template .pgpass
+    chmod 600 .pgpass
+
+The containers default to the password `mysecretpassword`. If you prefer to use a different credential, export `PGTAPME_DB_PASSWORD` (or define it in a `.env` file that Docker Compose can read) and update the copied `.pgpass` entry to match before booting the stack.
+
+Then launch the stack:
+
     docker compose up -d
 
 ## Initialize the pgtapme database, lets first try get the status

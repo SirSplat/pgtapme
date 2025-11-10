@@ -10,7 +10,8 @@ services:
     environment:
       - PYTHONUNBUFFERED=1 # Ensure the output is not buffered, useful for logging
     depends_on:
-      - pgtapme_db
+      pgtapme_db:
+        condition: service_healthy
     command: [ "tail", "-f", "/dev/null" ] # Keeps the container running for devcontainer usage
 
   pgtapme_db:
@@ -19,13 +20,19 @@ services:
       dockerfile: Dockerfile
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_PASSWORD: ${PGTAPME_DB_PASSWORD:-mysecretpassword}
       POSTGRES_DB: postgres
     user: postgres
     ports:
       - "5433:5432"
     volumes:
       - ./db/conf.d:/etc/postgresql/conf.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+      start_period: 5s
 
   sqitch:
     image: sqitch/sqitch
@@ -40,7 +47,8 @@ services:
     entrypoint: /bin/bash
     command: -c "tail -f /dev/null"
     depends_on:
-      - pgtapme_db
+      pgtapme_db:
+        condition: service_healthy
 
   pg_prove:
     image: itheory/pg_prove
@@ -52,4 +60,5 @@ services:
     entrypoint: /bin/sh
     command: -c "tail -f /dev/null"
     depends_on:
-      - pgtapme_db
+      pgtapme_db:
+        condition: service_healthy
