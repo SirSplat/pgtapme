@@ -31,7 +31,7 @@ jobs:
       - name: Prepare generated tests directory
         run: |
           mkdir -p code/pgtapme_generated_files
-          chmod 775 code/pgtapme_generated_files
+          chmod 777 code/pgtapme_generated_files
 
       - name: Build containers
         run: docker compose build
