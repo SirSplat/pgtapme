@@ -739,7 +739,7 @@ def get_schema_info(cursor: TextIO) -> List[str]:
             pg_catalog.pg_namespace AS n
         WHERE
             n.nspname NOT IN ( 'information_schema' ) AND
-            n.nspname NOT ILIKE 'pg_%'
+            n.nspname NOT LIKE 'pg!_%' ESCAPE '!'
     """
     )
     records = cursor.fetchall()
@@ -772,7 +772,7 @@ def get_table_info(cursor: TextIO) -> List[str]:
             JOIN pg_catalog.pg_namespace AS n ON (
                 n.oid = c.relnamespace AND
                 n.nspname NOT IN ( 'information_schema' ) AND
-                n.nspname NOT ILIKE 'pg_%'
+                n.nspname NOT LIKE 'pg!_%' ESCAPE '!'
             )
             LEFT JOIN pg_catalog.pg_constraint AS pc ON ( pc.conrelid = c.oid )
         WHERE
@@ -828,7 +828,7 @@ def get_column_info(cursor: TextIO) -> List[str]:
             )
         WHERE
             n.nspname NOT IN ( 'information_schema' ) AND
-            n.nspname NOT ILIKE 'pg_%' AND
+            n.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND
             attnum > 0 AND
             NOT a.attisdropped
         ORDER BY
@@ -968,7 +968,7 @@ def get_table_family_tree(cursor: TextIO) -> List[str]:
                 JOIN pg_catalog.pg_namespace n2 ON c2.relnamespace = n2.oid
             WHERE
                 n2.nspname NOT IN ('information_schema') AND
-                n2.nspname NOT ILIKE 'pg_%' AND
+                n2.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND
                 c2.relkind IN ('p', 'r')
             UNION
             -- select the descendents
@@ -991,7 +991,7 @@ def get_table_family_tree(cursor: TextIO) -> List[str]:
                         JOIN pg_catalog.pg_namespace n2 ON c2.relnamespace = n2.oid
                     WHERE
                         n2.nspname NOT IN ('information_schema') AND
-                        n2.nspname NOT ILIKE 'pg_%' AND
+                        n2.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND
                         c2.relkind IN ('p', 'r')
                 )
         )
@@ -1101,7 +1101,7 @@ def get_index_info(cursor: TextIO) -> List[str]:
             JOIN pg_am am ON ( am.oid = ci.relam )
         WHERE
             n.nspname NOT IN ( 'information_schema' ) AND
-            n.nspname NOT ILIKE 'pg_%'
+            n.nspname NOT LIKE 'pg!_%' ESCAPE '!'
     """
     )
     records = cursor.fetchall()
@@ -1135,7 +1135,7 @@ def get_rule_info(cursor: TextIO) -> List[str]:
             JOIN pg_catalog.pg_namespace n ON ( n.oid = c.relnamespace )
         WHERE
             n.nspname NOT IN ( 'information_schema' ) AND
-            n.nspname NOT ILIKE 'pg_%' AND
+            n.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND
             r.rulename != '_RETURN'
         ORDER BY
           n.nspname,
@@ -1207,7 +1207,7 @@ def get_foreign_key_info(cursor: TextIO) -> List[str]:
             k1.confrelid <> 0::oid AND
             k1.contype = 'f'::"char" AND
             n1.nspname NOT IN ( 'information_schema' ) AND
-            n1.nspname NOT ILIKE 'pg_%'
+            n1.nspname NOT LIKE 'pg!_%' ESCAPE '!'
         GROUP BY
             current_database(),
             n1.nspname,
@@ -1245,7 +1245,7 @@ def get_trigger_info(cursor: TextIO) -> List[str]:
         WHERE
             NOT t.tgisinternal AND
             nt.nspname NOT IN ( 'information_schema' ) AND
-            nt.nspname NOT ILIKE 'pg_%'
+            nt.nspname NOT LIKE 'pg!_%' ESCAPE '!'
         ORDER BY
             current_database(),
             nt.nspname,
@@ -1312,14 +1312,14 @@ def get_view_info(cursor: TextIO) -> List[str]:
                 JOIN pg_catalog.pg_namespace AS vn ON (
                     vn.oid = vc.relnamespace AND
                     vn.nspname NOT IN ('information_schema') AND
-                    vn.nspname NOT ILIKE 'pg_%'
+                    vn.nspname NOT LIKE 'pg!_%' ESCAPE '!'
                 )
                 JOIN pg_catalog.pg_depend AS d ON (r.oid = d.objid)
                 JOIN pg_catalog.pg_class AS tc ON (tc.oid = d.refobjid AND tc.relname != vc.relname) -- Prevents tap_funky from being included.
                 JOIN pg_catalog.pg_namespace AS tn ON (
                     tn.oid = tc.relnamespace AND
                     tn.nspname NOT IN ('information_schema') AND
-                    tn.nspname NOT ILIKE 'pg_%'
+                    tn.nspname NOT LIKE 'pg!_%' ESCAPE '!'
                 )
         ) AS subquery
         GROUP BY
@@ -1375,7 +1375,7 @@ def get_foreign_table_info(cursor: TextIO) -> List[str]:
             JOIN pg_catalog.pg_namespace AS n ON (
                 n.oid = c.relnamespace AND
                 n.nspname NOT IN ( 'information_schema' ) AND
-                n.nspname NOT ILIKE 'pg_%'
+                n.nspname NOT LIKE 'pg!_%' ESCAPE '!'
             )
         WHERE
             c.relkind = 'f'
@@ -1494,7 +1494,7 @@ def get_function_info(cursor: TextIO) -> List[str]:
                 JOIN pg_catalog.pg_language AS l ON ( l.oid = p.prolang )
             WHERE
                 n.nspname NOT IN ( 'information_schema' ) AND
-                n.nspname NOT ILIKE 'pg_%'
+                n.nspname NOT LIKE 'pg!_%' ESCAPE '!'
             ORDER BY
                 proc_oid,
                 nr
@@ -1518,6 +1518,260 @@ def get_function_info(cursor: TextIO) -> List[str]:
     logging.debug(f"Query executed successfully, records fetched: {records}")
     if not records:
         logging.warning("No function info found.")
+    return records
+
+
+@log_function_call
+def get_database_privs(cursor: TextIO) -> List:
+    logging.debug("Executing query to get database privileges.")
+    cursor.execute(
+        """
+        SELECT r.rolname AS role_name,
+            ARRAY(
+                SELECT p FROM unnest(ARRAY['CONNECT','CREATE','TEMPORARY']) p
+                WHERE has_database_privilege(r.rolname, current_database(), p)
+                ORDER BY p
+            ) AS privileges
+        FROM pg_catalog.pg_roles r
+        WHERE EXISTS (
+            SELECT 1 FROM pg_catalog.pg_database d
+            CROSS JOIN LATERAL aclexplode(COALESCE(d.datacl, acldefault('d', d.datdba))) a
+            WHERE d.datname = current_database() AND a.grantee = r.oid
+        )
+        ORDER BY r.rolname
+        """
+    )
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No database privilege info found.")
+    return records
+
+
+@log_function_call
+def get_schema_privs(cursor: TextIO, schema_name: str) -> List:
+    logging.debug(f"Executing query to get schema privileges for: {schema_name}")
+    cursor.execute(
+        """
+        SELECT r.rolname AS role_name,
+            ARRAY_AGG(a.privilege_type ORDER BY a.privilege_type) AS privileges
+        FROM pg_catalog.pg_namespace n
+        CROSS JOIN LATERAL aclexplode(COALESCE(n.nspacl, acldefault('n', n.nspowner)))
+            AS a(grantor, grantee, privilege_type, is_grantable)
+        JOIN pg_catalog.pg_roles r ON r.oid = a.grantee
+        WHERE n.nspname = %s
+        GROUP BY r.rolname ORDER BY r.rolname
+        """,
+        (schema_name,),
+    )
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No schema privilege info found for: {schema_name}")
+    return records
+
+
+@log_function_call
+def get_tablespace_privs(cursor: TextIO, tablespace_name: str) -> List:
+    logging.debug(f"Executing query to get tablespace privileges for: {tablespace_name}")
+    cursor.execute(
+        """
+        SELECT r.rolname AS role_name,
+            ARRAY_AGG(a.privilege_type ORDER BY a.privilege_type) AS privileges
+        FROM pg_catalog.pg_tablespace ts
+        CROSS JOIN LATERAL aclexplode(COALESCE(ts.spcacl, acldefault('t', ts.spcowner)))
+            AS a(grantor, grantee, privilege_type, is_grantable)
+        JOIN pg_catalog.pg_roles r ON r.oid = a.grantee
+        WHERE ts.spcname = %s
+        GROUP BY r.rolname ORDER BY r.rolname
+        """,
+        (tablespace_name,),
+    )
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No tablespace privilege info found for: {tablespace_name}")
+    return records
+
+
+@log_function_call
+def get_language_privs(cursor: TextIO, language_name: str) -> List:
+    logging.debug(f"Executing query to get language privileges for: {language_name}")
+    cursor.execute(
+        """
+        SELECT r.rolname AS role_name,
+            ARRAY_AGG(a.privilege_type ORDER BY a.privilege_type) AS privileges
+        FROM pg_catalog.pg_language l
+        CROSS JOIN LATERAL aclexplode(COALESCE(l.lanacl, acldefault('l', l.lanowner)))
+            AS a(grantor, grantee, privilege_type, is_grantable)
+        JOIN pg_catalog.pg_roles r ON r.oid = a.grantee
+        WHERE l.lanname = %s
+        GROUP BY r.rolname ORDER BY r.rolname
+        """,
+        (language_name,),
+    )
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No language privilege info found for: {language_name}")
+    return records
+
+
+@log_function_call
+def get_sequence_privs(cursor: TextIO, schema_name: str, sequence_name: str) -> List:
+    logging.debug(f"Executing query to get sequence privileges for: {schema_name}.{sequence_name}")
+    cursor.execute(
+        """
+        SELECT r.rolname AS role_name,
+            ARRAY_AGG(a.privilege_type ORDER BY a.privilege_type) AS privileges
+        FROM pg_catalog.pg_class c
+        JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+        CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl, acldefault('r', c.relowner)))
+            AS a(grantor, grantee, privilege_type, is_grantable)
+        JOIN pg_catalog.pg_roles r ON r.oid = a.grantee
+        WHERE n.nspname = %s AND c.relname = %s AND c.relkind = 'S'
+        GROUP BY r.rolname ORDER BY r.rolname
+        """,
+        (schema_name, sequence_name),
+    )
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No sequence privilege info found for: {schema_name}.{sequence_name}")
+    return records
+
+
+@log_function_call
+def get_table_privs(cursor: TextIO, schema_name: str, table_name: str) -> List:
+    logging.debug(f"Executing query to get table privileges for: {schema_name}.{table_name}")
+    cursor.execute(
+        """
+        SELECT r.rolname AS role_name,
+            ARRAY_AGG(a.privilege_type ORDER BY a.privilege_type) AS privileges
+        FROM pg_catalog.pg_class c
+        JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+        CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl, acldefault('r', c.relowner)))
+            AS a(grantor, grantee, privilege_type, is_grantable)
+        JOIN pg_catalog.pg_roles r ON r.oid = a.grantee
+        WHERE n.nspname = %s AND c.relname = %s AND c.relkind IN ('r', 'p')
+        GROUP BY r.rolname ORDER BY r.rolname
+        """,
+        (schema_name, table_name),
+    )
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No table privilege info found for: {schema_name}.{table_name}")
+    return records
+
+
+@log_function_call
+def get_function_privs(cursor: TextIO, schema_name: str, func_name: str, arg_types: list) -> List:
+    logging.debug(f"Executing query to get function privileges for: {schema_name}.{func_name}")
+    cursor.execute(
+        """
+        SELECT r.rolname AS role_name,
+            ARRAY_AGG(a.privilege_type ORDER BY a.privilege_type) AS privileges
+        FROM pg_catalog.pg_proc p
+        JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+        CROSS JOIN LATERAL aclexplode(COALESCE(p.proacl, acldefault('f', p.proowner)))
+            AS a(grantor, grantee, privilege_type, is_grantable)
+        JOIN pg_catalog.pg_roles r ON r.oid = a.grantee
+        WHERE n.nspname = %s AND p.proname = %s
+            AND p.proargtypes::text = (
+                SELECT STRING_AGG(t.oid::text, ' ' ORDER BY ordinality)
+                FROM unnest(%s::text[]) WITH ORDINALITY AS u(typname, ordinality)
+                JOIN pg_catalog.pg_type t ON t.typname = u.typname
+            )
+        GROUP BY r.rolname ORDER BY r.rolname
+        """,
+        (schema_name, func_name, arg_types),
+    )
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No function privilege info found for: {schema_name}.{func_name}")
+    return records
+
+
+@log_function_call
+def get_column_privs(cursor: TextIO, schema_name: str, table_name: str, column_name: str) -> List:
+    logging.debug(f"Executing query to get column privileges for: {schema_name}.{table_name}.{column_name}")
+    cursor.execute(
+        """
+        SELECT r.rolname AS role_name,
+            ARRAY_AGG(a.privilege_type ORDER BY a.privilege_type) AS privileges
+        FROM pg_catalog.pg_attribute att
+        JOIN pg_catalog.pg_class c ON c.oid = att.attrelid
+        JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+        CROSS JOIN LATERAL aclexplode(att.attacl)
+            AS a(grantor, grantee, privilege_type, is_grantable)
+        JOIN pg_catalog.pg_roles r ON r.oid = a.grantee
+        WHERE n.nspname = %s AND c.relname = %s AND att.attname = %s
+        GROUP BY r.rolname ORDER BY r.rolname
+        """,
+        (schema_name, table_name, column_name),
+    )
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No column privilege info found for: {schema_name}.{table_name}.{column_name}")
+    return records
+
+
+@log_function_call
+def get_policies_are(cursor: TextIO, schema_name: str, table_name: str) -> List:
+    logging.debug(f"Executing query to get policies for: {schema_name}.{table_name}")
+    cursor.execute(
+        """
+        SELECT ARRAY_AGG(p.polname ORDER BY p.polname) AS policies_are
+        FROM pg_catalog.pg_policy p
+        JOIN pg_catalog.pg_class c ON c.oid = p.polrelid
+        JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = %s AND c.relname = %s
+        """,
+        (schema_name, table_name),
+    )
+    record = cursor.fetchone()
+    logging.debug(f"Query executed successfully, record fetched: {record}")
+    if not record or record.policies_are is None:
+        logging.debug(f"No policies found for: {schema_name}.{table_name}")
+        return []
+    return record.policies_are
+
+
+@log_function_call
+def get_policy_info(cursor: TextIO, schema_name: str, table_name: str) -> List:
+    logging.debug(f"Executing query to get policy info for: {schema_name}.{table_name}")
+    cursor.execute(
+        """
+        SELECT p.polname AS policy_name,
+            COALESCE(
+                ARRAY_AGG(r.rolname ORDER BY r.rolname) FILTER (WHERE r.rolname IS NOT NULL),
+                ARRAY[]::TEXT[]
+            ) AS policy_roles,
+            CASE p.polcmd
+                WHEN 'r' THEN 'SELECT'
+                WHEN 'a' THEN 'INSERT'
+                WHEN 'w' THEN 'UPDATE'
+                WHEN 'd' THEN 'DELETE'
+                ELSE 'ALL'
+            END AS policy_cmd,
+            p.polpermissive AS is_permissive
+        FROM pg_catalog.pg_policy p
+        JOIN pg_catalog.pg_class c ON c.oid = p.polrelid
+        JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+        LEFT JOIN pg_catalog.pg_roles r ON r.oid = ANY(p.polroles) AND r.oid != 0
+        WHERE n.nspname = %s AND c.relname = %s
+        GROUP BY p.polname, p.polcmd, p.polpermissive
+        ORDER BY p.polname
+        """,
+        (schema_name, table_name),
+    )
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No policy info found for: {schema_name}.{table_name}")
     return records
 
 

@@ -2,7 +2,7 @@ import logging
 from typing import TextIO
 from io import TextIOWrapper
 
-from src.getters.get_catalog_data import get_column_info
+from src.getters.get_catalog_data import get_column_info, get_column_privs
 from src.helpers import (
     create_file_path,
     format_single_quote,
@@ -17,6 +17,7 @@ from src.writers.write_pgtap_tests import (
     write_col_is_null,
     write_col_not_null,
     write_col_type_is,
+    write_column_privs_are,
     write_has_column,
     write_has_schema,
     write_has_table,
@@ -45,6 +46,8 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
             data.column_name,
         )
 
+        privs = get_column_privs(cursor, data.schema_name, data.table_name, data.column_name)
+
         try:
             with open(file_path, "w") as f:
                 write_tests(
@@ -58,6 +61,7 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
                     dt_type=data.dt_type,
                     type_name=data.type_name,
                     column_default=data.column_default,
+                    privs_are=privs,
                 )
         except Exception as e:
             logging.error(f"Failed to generate tests for {module_type}: {e}.")
@@ -77,6 +81,7 @@ def write_tests(
     dt_type: str,
     type_name: str,
     column_default: str,
+    privs_are=None,
 ) -> None:
     write_tests_header(f)
 
@@ -109,5 +114,8 @@ def write_tests(
     write_col_type_is(
         f, schema_name, table_name, column_name, dt_schema, remove_schema(dt_type)
     )
+
+    for priv in (privs_are or []):
+        write_column_privs_are(f, schema_name, table_name, column_name, priv.role_name, priv.privileges)
 
     write_tests_footer(f)

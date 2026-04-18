@@ -2,13 +2,14 @@ import logging
 from typing import TextIO
 from io import TextIOWrapper
 
-from src.getters.get_catalog_data import get_languages_info
+from src.getters.get_catalog_data import get_language_privs, get_languages_info
 from src.helpers import create_file_path, log_function_call, set_plan_count
 from src.writers.write_pgtap_tests import (
     write_has_language,
     write_has_role,
     write_language_is_trusted,
     write_language_owner_is,
+    write_language_privs_are,
     write_tests_footer,
     write_tests_header,
 )
@@ -21,6 +22,8 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
             output_dir, "cluster", module_type, data.language_name
         )
 
+        privs = get_language_privs(cursor, data.language_name)
+
         try:
             with open(file_path, "w") as f:
                 write_tests(
@@ -28,6 +31,7 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
                     language_name=data.language_name,
                     owner_is=data.owner_is,
                     is_trusted=data.is_trusted,
+                    privs_are=privs,
                 )
         except Exception as e:
             logging.error(f"Failed to generate tests for {module_type}: {e}.")
@@ -35,7 +39,7 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
         set_plan_count(file_path)
 
 
-def write_tests(f: TextIOWrapper, language_name: str, owner_is: str, is_trusted: str) -> None:
+def write_tests(f: TextIOWrapper, language_name: str, owner_is: str, is_trusted: str, privs_are=None) -> None:
     write_tests_header(f)
 
     write_has_language(f, language_name)
@@ -44,5 +48,8 @@ def write_tests(f: TextIOWrapper, language_name: str, owner_is: str, is_trusted:
 
     if is_trusted:
         write_language_is_trusted(f, language_name)
+
+    for priv in (privs_are or []):
+        write_language_privs_are(f, language_name, priv.role_name, priv.privileges)
 
     write_tests_footer(f)

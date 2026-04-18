@@ -2,9 +2,10 @@ import logging
 from typing import TextIO
 from io import TextIOWrapper
 
-from src.getters.get_catalog_data import get_database_info, get_schemas_are
+from src.getters.get_catalog_data import get_database_info, get_database_privs, get_schemas_are
 from src.helpers import create_file_path, log_function_call, set_plan_count
 from src.writers.write_pgtap_tests import (
+    write_database_privs_are,
     write_db_owner_is,
     write_has_role,
     write_schemas_are,
@@ -41,5 +42,8 @@ def write_tests(
 
     data = get_schemas_are(cursor)
     write_schemas_are(f, database_name, data)
+
+    for priv in get_database_privs(cursor):
+        write_database_privs_are(f, database_name, priv.role_name, priv.privileges)
 
     write_tests_footer(f)

@@ -12,6 +12,7 @@ from src.getters.get_catalog_data import (
     get_opclasses_are,
     get_operators_are,
     get_schema_info,
+    get_schema_privs,
     get_sequences_are,
     get_tables_are,
     get_types_are,
@@ -30,6 +31,7 @@ from src.writers.write_pgtap_tests import (
     write_opclasses_are,
     write_operators_are,
     write_schema_owner_is,
+    write_schema_privs_are,
     write_sequences_are,
     write_tables_are,
     write_tests_footer,
@@ -106,5 +108,8 @@ def write_tests(
 
     data = get_extensions_are(cursor, schema_name)
     write_extensions_are(f, data, schema_name)
+
+    for priv in get_schema_privs(cursor, schema_name):
+        write_schema_privs_are(f, schema_name, priv.role_name, priv.privileges)
 
     write_tests_footer(f)

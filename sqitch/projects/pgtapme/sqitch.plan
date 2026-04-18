@@ -45,3 +45,6 @@ rules/d_date_rule_create_update_rule [appschema tables/d_date_rule tables/d_date
 rules/d_date_rule_create_delete_rule [appschema tables/d_date_rule tables/d_date_rule_create_partitions] 2024-07-02T10:50:31Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_rule create delete rule.
 data/d_date_rule_populate_partitions [appschema tables/d_date_rule rules/d_date_rule_create_insert_rule rules/d_date_rule_create_update_rule rules/d_date_rule_create_delete_rule] 2024-07-02T11:27:40Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Add pgtapme.d_date_rule data.
 @v1.0 2024-07-02T11:37:18Z Leon Rogers <Leon.Rogers@BlueElephantDBA.co.uk> # Tag v1.0 of pgtapme.py development database
+roles/pgtapme_roles 2026-04-18T00:00:00Z sqitch <sqitch@pgtapme> # Add pgtapme_readonly and pgtapme_readwrite roles with dbo membership.
+grants/pgtapme_grants [roles/pgtapme_roles] 2026-04-18T01:00:00Z sqitch <sqitch@pgtapme> # Grant database, schema, table, sequence, function, and language privileges to pgtapme_readonly and pgtapme_readwrite.
+policies/pgtapme_rls [grants/pgtapme_grants] 2026-04-18T02:00:00Z sqitch <sqitch@pgtapme> # Enable RLS on pgtapme.lkp_dow with permissive policies for pgtapme_readonly and pgtapme_readwrite.

@@ -893,15 +893,6 @@ def write_has_materialized_view(
 
 
 @log_function_call
-def write_has_foreign_table(
-    f: TextIOWrapper, mtv_schema: str, mtv_name: str
-) -> None:
-    f.write(
-        f"  SELECT has_materialized_view('{mtv_schema}', '{mtv_name}', 'Materialized view {mtv_schema}.{mtv_name} should exist.');\n\n"
-    )
-
-
-@log_function_call
 def write_has_foreign_table(f: TextIOWrapper, ft_schema: str, ft_name: str) -> None:
     f.write(
         f"  SELECT has_foreign_table('{ft_schema}', '{ft_name}', 'Foreign table {ft_schema}.{ft_name} should exist.');\n\n"
@@ -1185,6 +1176,117 @@ def write_domain_type_is(
     f.write(
         f"  SELECT domain_type_is('{schema}', '{name}', '{t_schema}', '{t_name}', 'Domain {schema}.{name} should have the correct type.');\n\n"
     )
+
+
+@log_function_call
+def write_database_privs_are(
+    f: TextIOWrapper, db_name: str, role: str, privileges: list
+) -> None:
+    array_str = format_array_parameter(privileges)
+    f.write(
+        f"  SELECT database_privs_are('{db_name}', '{role}', {array_str}, 'Database {db_name} should have the correct privileges for {role}.');\n\n"
+    )
+
+
+@log_function_call
+def write_schema_privs_are(
+    f: TextIOWrapper, schema: str, role: str, privileges: list
+) -> None:
+    array_str = format_array_parameter(privileges)
+    f.write(
+        f"  SELECT schema_privs_are('{schema}', '{role}', {array_str}, 'Schema {schema} should have the correct privileges for {role}.');\n\n"
+    )
+
+
+@log_function_call
+def write_table_privs_are(
+    f: TextIOWrapper, schema: str, table: str, role: str, privileges: list
+) -> None:
+    array_str = format_array_parameter(privileges)
+    f.write(
+        f"  SELECT table_privs_are('{schema}', '{table}', '{role}', {array_str}, 'Table {schema}.{table} should have the correct privileges for {role}.');\n\n"
+    )
+
+
+@log_function_call
+def write_sequence_privs_are(
+    f: TextIOWrapper, schema: str, sequence: str, role: str, privileges: list
+) -> None:
+    array_str = format_array_parameter(privileges)
+    f.write(
+        f"  SELECT sequence_privs_are('{schema}', '{sequence}', '{role}', {array_str}, 'Sequence {schema}.{sequence} should have the correct privileges for {role}.');\n\n"
+    )
+
+
+@log_function_call
+def write_function_privs_are(
+    f: TextIOWrapper, schema: str, func: str, arg_types: list, role: str, privileges: list
+) -> None:
+    args_str = format_array_parameter(arg_types)
+    privs_str = format_array_parameter(privileges)
+    f.write(
+        f"  SELECT function_privs_are('{schema}', '{func}', {args_str}, '{role}', {privs_str}, 'Function {schema}.{func} should have the correct privileges for {role}.');\n\n"
+    )
+
+
+@log_function_call
+def write_language_privs_are(
+    f: TextIOWrapper, language: str, role: str, privileges: list
+) -> None:
+    array_str = format_array_parameter(privileges)
+    f.write(
+        f"  SELECT language_privs_are('{language}', '{role}', {array_str}, 'Language {language} should have the correct privileges for {role}.');\n\n"
+    )
+
+
+@log_function_call
+def write_column_privs_are(
+    f: TextIOWrapper, schema: str, table: str, column: str, role: str, privileges: list
+) -> None:
+    array_str = format_array_parameter(privileges)
+    f.write(
+        f"  SELECT column_privs_are('{schema}', '{table}', '{column}', '{role}', {array_str}, 'Column {schema}.{table}.{column} should have the correct privileges for {role}.');\n\n"
+    )
+
+
+@log_function_call
+def write_tablespace_privs_are(
+    f: TextIOWrapper, tablespace: str, role: str, privileges: list
+) -> None:
+    array_str = format_array_parameter(privileges)
+    f.write(
+        f"  SELECT tablespace_privs_are('{tablespace}', '{role}', {array_str}, 'Tablespace {tablespace} should have the correct privileges for {role}.');\n\n"
+    )
+
+
+@log_function_call
+def write_policies_are(
+    f: TextIOWrapper, schema: str, table: str, policies: list
+) -> None:
+    array_str = format_array_parameter(policies)
+    f.write(
+        f"  SELECT policies_are('{schema}', '{table}', {array_str}, 'Table {schema}.{table} should have the correct policies.');\n\n"
+    )
+
+
+@log_function_call
+def write_policy_roles_are(
+    f: TextIOWrapper, schema: str, table: str, policy: str, roles: list
+) -> None:
+    array_str = format_array_parameter(roles)
+    f.write(
+        f"  SELECT policy_roles_are('{schema}', '{table}', '{policy}', {array_str}, 'Policy {policy} on {schema}.{table} should apply to the correct roles.');\n\n"
+    )
+
+
+@log_function_call
+def write_policy_cmd_is(
+    f: TextIOWrapper, schema: str, table: str, policy: str, cmd: str
+) -> None:
+    f.write(
+        f"  SELECT policy_cmd_is('{schema}', '{table}', '{policy}', '{cmd}', 'Policy {policy} on {schema}.{table} should apply to the correct command.');\n\n"
+    )
+
 
 
 @log_function_call

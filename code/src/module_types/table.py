@@ -9,9 +9,12 @@ from src.getters.get_catalog_data import (
     get_indexes_are,
     get_is_partition_of,
     get_partitions_are,
+    get_policies_are,
+    get_policy_info,
     get_rules_are,
     get_table_family_tree,
     get_table_info,
+    get_table_privs,
     get_triggers_are,
 )
 from src.helpers import create_file_path, log_function_call, set_plan_count
@@ -41,8 +44,12 @@ from src.writers.write_pgtap_tests import (
     write_is_partitioned,
     write_isnt_partitioned,
     write_partitions_are,
+    write_policies_are,
+    write_policy_cmd_is,
+    write_policy_roles_are,
     write_rules_are,
     write_table_owner_is,
+    write_table_privs_are,
     write_tests_footer,
     write_tests_header,
     write_triggers_are,
@@ -217,5 +224,15 @@ def write_tests(
         write_has_inherited_tables(f, schema_name, table_name)
     else:
         write_hasnt_inherited_tables(f, schema_name, table_name)
+
+    for priv in get_table_privs(cursor, schema_name, table_name):
+        write_table_privs_are(f, schema_name, table_name, priv.role_name, priv.privileges)
+
+    policies = get_policies_are(cursor, schema_name, table_name)
+    if policies:
+        write_policies_are(f, schema_name, table_name, policies)
+        for policy in get_policy_info(cursor, schema_name, table_name):
+            write_policy_roles_are(f, schema_name, table_name, policy.policy_name, policy.policy_roles)
+            write_policy_cmd_is(f, schema_name, table_name, policy.policy_name, policy.policy_cmd)
 
     write_tests_footer(f)

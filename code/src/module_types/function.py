@@ -2,7 +2,7 @@ import logging
 from typing import TextIO, List
 from io import TextIOWrapper
 
-from src.getters.get_catalog_data import get_function_info
+from src.getters.get_catalog_data import get_function_info, get_function_privs
 from src.helpers import create_file_path, log_function_call, set_plan_count
 from src.writers.write_pgtap_tests import (
     write_function_is_aggregate,
@@ -20,6 +20,7 @@ from src.writers.write_pgtap_tests import (
     write_function_language_is,
     write_function_owner_is,
     write_function_returns,
+    write_function_privs_are,
     write_function_volatility_is,
     write_has_function,
     write_has_role,
@@ -47,6 +48,8 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
             data.pro_signature,
         )
 
+        privs = get_function_privs(cursor, data.pro_schema, data.pro_name, data.pro_args)
+
         try:
             with open(file_path, "w") as f:
                 write_tests(
@@ -62,6 +65,7 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
                     pro_returns=data.pro_returns,
                     pro_args=data.pro_args,
                     pro_signature=data.pro_signature,
+                    privs_are=privs,
                 )
         except Exception as e:
             logging.error(f"Failed to generate tests for {module_type}: {e}.")
@@ -83,11 +87,12 @@ def write_tests(
     pro_returns: str,
     pro_args: List[str],
     pro_signature: str,
+    privs_are=None,
 ) -> None:
     write_tests_header(f)
 
     write_has_schema(f, pro_schema)
-    write_has_function(f, pro_schema, pro_name, pro_args)
+    write_has_function(f, pro_schema, pro_name, pro_args, pro_signature)
     write_has_role(f, pro_owner)
     write_function_owner_is(f, pro_schema, pro_name, pro_args, pro_owner, pro_signature)
     write_function_language_is(
@@ -134,5 +139,8 @@ def write_tests(
     write_function_volatility_is(
         f, pro_schema, pro_name, pro_args, pro_volatility, pro_signature
     )
+
+    for priv in (privs_are or []):
+        write_function_privs_are(f, pro_schema, pro_name, pro_args, priv.role_name, priv.privileges)
 
     write_tests_footer(f)

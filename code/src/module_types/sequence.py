@@ -2,13 +2,14 @@ import logging
 from io import TextIOWrapper
 from typing import TextIO
 
-from src.getters.get_catalog_data import get_sequence_info
+from src.getters.get_catalog_data import get_sequence_info, get_sequence_privs
 from src.helpers import create_file_path, log_function_call, set_plan_count
 from src.writers.write_pgtap_tests import (
     write_has_role,
     write_has_schema,
     write_has_sequence,
     write_sequence_owner_is,
+    write_sequence_privs_are,
     write_tests_footer,
     write_tests_header,
 )
@@ -31,6 +32,8 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
             data.seq_name,
         )
 
+        privs = get_sequence_privs(cursor, data.seq_schema, data.seq_name)
+
         try:
             with open(file_path, "w") as f:
                 write_tests(
@@ -38,6 +41,7 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
                     seq_schema=data.seq_schema,
                     seq_name=data.seq_name,
                     seq_owner=data.seq_owner,
+                    privs_are=privs,
                 )
         except Exception as e:
             logging.error(f"Failed to generate tests for {module_type}: {e}.")
@@ -47,7 +51,7 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
 
 @log_function_call
 def write_tests(
-    f: TextIOWrapper, seq_schema: str, seq_name: str, seq_owner: str
+    f: TextIOWrapper, seq_schema: str, seq_name: str, seq_owner: str, privs_are=None
 ) -> None:
     write_tests_header(f)
 
@@ -55,5 +59,8 @@ def write_tests(
     write_has_sequence(f, seq_schema, seq_name)
     write_has_role(f, seq_owner)
     write_sequence_owner_is(f, seq_schema, seq_name, seq_owner)
+
+    for priv in (privs_are or []):
+        write_sequence_privs_are(f, seq_schema, seq_name, priv.role_name, priv.privileges)
 
     write_tests_footer(f)
