@@ -14,6 +14,7 @@ concurrency:
 
 jobs:
   build-and-test:
+    name: Build and test
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -27,15 +28,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Configure pgpass credentials
-        run: |
-          printf '*:*:*:%s:%s\n' "${PGTAPME_DB_USER}" "${PGTAPME_DB_PASSWORD}" > .pgpass
-          chmod 600 .pgpass
-
       - name: Prepare generated tests directory
         run: |
           mkdir -p code/pgtapme_generated_files
-          chmod 777 code/pgtapme_generated_files
+          chmod 775 code/pgtapme_generated_files
 
       - name: Build containers
         run: docker compose build
@@ -114,9 +110,6 @@ jobs:
         run: |
           if [ -d code/pgtapme_generated_files ] && [ "$(find code/pgtapme_generated_files -type f | head -n1)" ]; then
             tar -czf pgtapme-generated-tests.tar.gz -C code pgtapme_generated_files
-          else
-            echo "No generated pgTAP files found; uploading empty archive"
-            tar -czf pgtapme-generated-tests.tar.gz --files-from /dev/null
           fi
 
       - name: Upload generated pgTAP files
