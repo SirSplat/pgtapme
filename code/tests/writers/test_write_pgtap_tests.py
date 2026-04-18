@@ -146,6 +146,16 @@ from src.writers.write_pgtap_tests import (
     write_hasnt_trigger,
     write_hasnt_rule,
     write_hasnt_index,
+    write_hasnt_group,
+    write_hasnt_user,
+    write_hasnt_extension,
+    write_hasnt_relation,
+    write_hasnt_composite,
+    write_hasnt_operator,
+    write_hasnt_leftop,
+    write_hasnt_rightop,
+    write_hasnt_opclass,
+    write_hasnt_tablespace,
 )
 
 
@@ -994,5 +1004,59 @@ def test_write_hasnt_index(buf):
 def test_write_extension_schema_is(buf):
     write_extension_schema_is(buf, "btree_gist", "exts")
     assert output(buf) == "  SELECT extension_schema_is('btree_gist', 'exts', 'Extension btree_gist should be in schema exts.');\n\n"
+
+
+# ---------------------------------------------------------------------------
+# Remaining hasnt_* writers
+# ---------------------------------------------------------------------------
+
+def test_write_hasnt_group(buf):
+    write_hasnt_group(buf, "old_group")
+    assert output(buf) == "  SELECT hasnt_group('old_group', 'Group old_group should not exist.');\n\n"
+
+
+def test_write_hasnt_user(buf):
+    write_hasnt_user(buf, "old_user")
+    assert output(buf) == "  SELECT hasnt_user('old_user', 'User old_user should not exist.');\n\n"
+
+
+def test_write_hasnt_extension(buf):
+    write_hasnt_extension(buf, "public", "old_ext")
+    assert output(buf) == "  SELECT hasnt_extension('public', 'old_ext', 'Extension public.old_ext should not exist.');\n\n"
+
+
+def test_write_hasnt_relation(buf):
+    write_hasnt_relation(buf, "public", "old_rel")
+    assert output(buf) == "  SELECT hasnt_relation('public', 'old_rel', 'Relation public.old_rel should not exist.');\n\n"
+
+
+def test_write_hasnt_composite(buf):
+    write_hasnt_composite(buf, "public", "old_comp")
+    assert output(buf) == "  SELECT hasnt_composite('public', 'old_comp', 'Composite type public.old_comp should not exist.');\n\n"
+
+
+def test_write_hasnt_operator(buf):
+    write_hasnt_operator(buf, "public", "old_op", "integer", "integer")
+    assert output(buf) == "  SELECT hasnt_operator('old_op', 'public', 'integer', 'integer', 'Operator public.old_op should not exist.');\n\n"
+
+
+def test_write_hasnt_leftop(buf):
+    write_hasnt_leftop(buf, "old_op", "integer", "public")
+    assert output(buf) == "  SELECT hasnt_leftop('old_op', 'integer', 'public', 'Left operator old_op(integer, ?) in public should not exist.');\n\n"
+
+
+def test_write_hasnt_rightop(buf):
+    write_hasnt_rightop(buf, "old_op", "integer", "public")
+    assert output(buf) == "  SELECT hasnt_rightop('old_op', 'integer', 'public', 'Right operator old_op(?, integer) in public should not exist.');\n\n"
+
+
+def test_write_hasnt_opclass(buf):
+    write_hasnt_opclass(buf, "public", "old_opc")
+    assert output(buf) == "  SELECT hasnt_opclass('public', 'old_opc', 'Operator class public.old_opc should not exist.');\n\n"
+
+
+def test_write_hasnt_tablespace(buf):
+    write_hasnt_tablespace(buf, "old_ts")
+    assert output(buf) == "  SELECT hasnt_tablespace('old_ts', 'Tablespace old_ts should not exist.');\n\n"
 
 

@@ -1297,6 +1297,82 @@ def write_policy_cmd_is(
 
 
 @log_function_call
+def write_hasnt_group(f: TextIOWrapper, group_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_group('{group_name}', 'Group {group_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_user(f: TextIOWrapper, user_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_user('{user_name}', 'User {user_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_extension(f: TextIOWrapper, schema_name: str, ext_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_extension('{schema_name}', '{ext_name}', 'Extension {schema_name}.{ext_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_relation(f: TextIOWrapper, schema_name: str, rel_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_relation('{schema_name}', '{rel_name}', 'Relation {schema_name}.{rel_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_composite(f: TextIOWrapper, schema_name: str, comp_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_composite('{schema_name}', '{comp_name}', 'Composite type {schema_name}.{comp_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_operator(
+    f: TextIOWrapper, schema_name: str, op_name: str, left_type: str, right_type: str
+) -> None:
+    f.write(
+        f"  SELECT hasnt_operator('{op_name}', '{schema_name}', '{left_type}', '{right_type}', 'Operator {schema_name}.{op_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_leftop(
+    f: TextIOWrapper, op_name: str, left_type: str, schema_name: str
+) -> None:
+    f.write(
+        f"  SELECT hasnt_leftop('{op_name}', '{left_type}', '{schema_name}', 'Left operator {op_name}({left_type}, ?) in {schema_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_rightop(
+    f: TextIOWrapper, op_name: str, right_type: str, schema_name: str
+) -> None:
+    f.write(
+        f"  SELECT hasnt_rightop('{op_name}', '{right_type}', '{schema_name}', 'Right operator {op_name}(?, {right_type}) in {schema_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_opclass(f: TextIOWrapper, schema_name: str, opc_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_opclass('{schema_name}', '{opc_name}', 'Operator class {schema_name}.{opc_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_tablespace(f: TextIOWrapper, ts_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_tablespace('{ts_name}', 'Tablespace {ts_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
 def write_extension_schema_is(
     f: TextIOWrapper, extension_name: str, schema_name: str
 ) -> None:
