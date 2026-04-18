@@ -8,17 +8,13 @@ from src.writers.write_pgtap_tests import (
     write_has_role,
     write_is_member_of,
     write_is_superuser,
-    write_isnt_member_of,
     write_isnt_superuser,
     write_tests_footer,
     write_tests_header,
 )
 
 
-@log_function_call(
-    log_level=logging.INFO,
-    info_message="TODO: Need to work out how to get roles that do not have members, populate a members containg all roles",
-)
+@log_function_call
 def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
     for data in get_role_info(cursor):
         file_path = create_file_path(output_dir, "cluster", module_type, data.role_name)
@@ -30,7 +26,6 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
                     role_name=data.role_name,
                     is_superuser=data.is_superuser,
                     members=data.members,
-                    not_members=data.not_members,
                 )
         except Exception as e:
             logging.error(f"Failed to generate tests for {module_type}: {e}.")
@@ -41,9 +36,8 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
 def write_tests(
     f: TextIOWrapper,
     role_name: str,
-    is_superuser: str,
+    is_superuser: bool,
     members: List[str],
-    not_members: List[str],
 ) -> None:
     write_tests_header(f)
 
@@ -54,9 +48,8 @@ def write_tests(
     else:
         write_isnt_superuser(f, role_name)
 
-    # if members:
-    #     write_is_member_of(f, role_name, members)
-    # else:
-    #     write_isnt_member_of(f, role_name, not_members)
+    clean_members = [m for m in members if m is not None]
+    if clean_members:
+        write_is_member_of(f, role_name, clean_members)
 
     write_tests_footer(f)

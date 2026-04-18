@@ -95,7 +95,6 @@ services:
     volumes:
       - ./code/pgtapme_generated_files:/mnt/tests
       - ./pg_prove/pg_prove.sh:/mnt/pg_prove/pg_prove.sh
-      - ./pg_prove/projects/:/mnt/tests/
     environment:
       PGPASSWORD: mysecretpassword
     entrypoint: /bin/sh

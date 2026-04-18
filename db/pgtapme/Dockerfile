@@ -4,7 +4,7 @@ FROM postgres:16-alpine AS build
 # Install required packages and build tools
 RUN apk add --no-cache --update \
     postgresql-dev postgresql-contrib git openssl build-base make perl perl-dev less wget \
-    llvm15-dev clang15 \
+    llvm-dev clang \
     && rm -rf /var/cache/apk/* /tmp/*
 
 # Install pgTAP

@@ -380,14 +380,17 @@ def format_array_parameter(parameter):
         # Outputs: "ARRAY[]::TEXT[]"
     """
     if parameter is None:
-        result = "ARRAY[]::TEXT[]"
+        items = []
+    elif isinstance(parameter, str):
+        items = [parameter]
     elif isinstance(parameter, (list, tuple)):
-        result = f"ARRAY{parameter}::TEXT[]"
-    elif isinstance(parameter, (str)):
-        result = f"ARRAY['{parameter}']::TEXT[]"
+        items = list(parameter)
     else:
         logging.error("Parameter must be a list, tuple, or string")
         raise TypeError("Parameter must be a list or tuple")
+
+    escaped = [item.replace("'", "''") for item in items]
+    result = "ARRAY[{}]::TEXT[]".format(", ".join(f"'{item}'" for item in escaped))
 
     logging.debug(f"Formatted parameter: {result}")
     return result
