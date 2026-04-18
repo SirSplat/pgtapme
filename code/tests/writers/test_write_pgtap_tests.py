@@ -962,8 +962,8 @@ def test_write_hasnt_cast(buf):
 
 
 def test_write_is_indexed(buf):
-    write_is_indexed(buf, "public", "my_table")
-    assert output(buf) == "  SELECT is_indexed('public', 'my_table', 'Table public.my_table should be indexed.');\n\n"
+    write_is_indexed(buf, "public", "my_table", "my_idx")
+    assert output(buf) == "  SELECT is_indexed('public', 'my_table', 'my_idx', 'Table public.my_table should have index/column my_idx indexed.');\n\n"
 
 
 def test_write_hasnt_column(buf):
