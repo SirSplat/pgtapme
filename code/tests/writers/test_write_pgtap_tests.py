@@ -127,6 +127,7 @@ from src.writers.write_pgtap_tests import (
     write_type_owner_is,
     write_domain_type_is,
     write_has_domain,
+    write_extension_schema_is,
     write_hasnt_schema,
     write_hasnt_table,
     write_hasnt_view,
@@ -984,5 +985,14 @@ def test_write_hasnt_rule(buf):
 def test_write_hasnt_index(buf):
     write_hasnt_index(buf, "public", "my_table", "old_idx")
     assert output(buf) == "  SELECT hasnt_index('public', 'my_table', 'old_idx', 'Index public.my_table.old_idx should not exist.');\n\n"
+
+
+# ---------------------------------------------------------------------------
+# extension_schema_is
+# ---------------------------------------------------------------------------
+
+def test_write_extension_schema_is(buf):
+    write_extension_schema_is(buf, "btree_gist", "exts")
+    assert output(buf) == "  SELECT extension_schema_is('btree_gist', 'exts', 'Extension btree_gist should be in schema exts.');\n\n"
 
 

@@ -5,6 +5,7 @@ from typing import TextIO
 from src.getters.get_catalog_data import get_extension_info
 from src.helpers import create_file_path, log_function_call, set_plan_count
 from src.writers.write_pgtap_tests import (
+    write_extension_schema_is,
     write_has_extension,
     write_has_schema,
     write_tests_footer,

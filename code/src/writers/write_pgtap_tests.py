@@ -1297,6 +1297,15 @@ def write_policy_cmd_is(
 
 
 @log_function_call
+def write_extension_schema_is(
+    f: TextIOWrapper, extension_name: str, schema_name: str
+) -> None:
+    f.write(
+        f"  SELECT extension_schema_is('{extension_name}', '{schema_name}', 'Extension {extension_name} should be in schema {schema_name}.');\n\n"
+    )
+
+
+@log_function_call
 def write_hasnt_schema(f: TextIOWrapper, schema_name: str) -> None:
     f.write(
         f"  SELECT hasnt_schema('{schema_name}', 'Schema {schema_name} should not exist.');\n\n"
