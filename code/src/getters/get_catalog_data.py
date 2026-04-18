@@ -739,7 +739,7 @@ def get_schema_info(cursor: TextIO) -> List[str]:
             pg_catalog.pg_namespace AS n
         WHERE
             n.nspname NOT IN ( 'information_schema' ) AND
-            n.nspname NOT LIKE 'pg!_%' ESCAPE '!'
+            n.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND n.nspname != 'pgtap'
     """
     )
     records = cursor.fetchall()
@@ -772,7 +772,7 @@ def get_table_info(cursor: TextIO) -> List[str]:
             JOIN pg_catalog.pg_namespace AS n ON (
                 n.oid = c.relnamespace AND
                 n.nspname NOT IN ( 'information_schema' ) AND
-                n.nspname NOT LIKE 'pg!_%' ESCAPE '!'
+                n.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND n.nspname != 'pgtap'
             )
             LEFT JOIN pg_catalog.pg_constraint AS pc ON ( pc.conrelid = c.oid )
         WHERE
@@ -828,7 +828,7 @@ def get_column_info(cursor: TextIO) -> List[str]:
             )
         WHERE
             n.nspname NOT IN ( 'information_schema' ) AND
-            n.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND
+            n.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND n.nspname != 'pgtap' AND
             attnum > 0 AND
             NOT a.attisdropped
         ORDER BY
@@ -968,7 +968,7 @@ def get_table_family_tree(cursor: TextIO) -> List[str]:
                 JOIN pg_catalog.pg_namespace n2 ON c2.relnamespace = n2.oid
             WHERE
                 n2.nspname NOT IN ('information_schema') AND
-                n2.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND
+                n2.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND n2.nspname != 'pgtap' AND
                 c2.relkind IN ('p', 'r')
             UNION
             -- select the descendents
@@ -991,7 +991,7 @@ def get_table_family_tree(cursor: TextIO) -> List[str]:
                         JOIN pg_catalog.pg_namespace n2 ON c2.relnamespace = n2.oid
                     WHERE
                         n2.nspname NOT IN ('information_schema') AND
-                        n2.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND
+                        n2.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND n2.nspname != 'pgtap' AND
                         c2.relkind IN ('p', 'r')
                 )
         )
@@ -1101,7 +1101,7 @@ def get_index_info(cursor: TextIO) -> List[str]:
             JOIN pg_am am ON ( am.oid = ci.relam )
         WHERE
             n.nspname NOT IN ( 'information_schema' ) AND
-            n.nspname NOT LIKE 'pg!_%' ESCAPE '!'
+            n.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND n.nspname != 'pgtap'
     """
     )
     records = cursor.fetchall()
@@ -1135,7 +1135,7 @@ def get_rule_info(cursor: TextIO) -> List[str]:
             JOIN pg_catalog.pg_namespace n ON ( n.oid = c.relnamespace )
         WHERE
             n.nspname NOT IN ( 'information_schema' ) AND
-            n.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND
+            n.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND n.nspname != 'pgtap' AND
             r.rulename != '_RETURN'
         ORDER BY
           n.nspname,
@@ -1207,7 +1207,7 @@ def get_foreign_key_info(cursor: TextIO) -> List[str]:
             k1.confrelid <> 0::oid AND
             k1.contype = 'f'::"char" AND
             n1.nspname NOT IN ( 'information_schema' ) AND
-            n1.nspname NOT LIKE 'pg!_%' ESCAPE '!'
+            n1.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND n1.nspname != 'pgtap'
         GROUP BY
             current_database(),
             n1.nspname,
@@ -1245,7 +1245,7 @@ def get_trigger_info(cursor: TextIO) -> List[str]:
         WHERE
             NOT t.tgisinternal AND
             nt.nspname NOT IN ( 'information_schema' ) AND
-            nt.nspname NOT LIKE 'pg!_%' ESCAPE '!'
+            nt.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND nt.nspname != 'pgtap'
         ORDER BY
             current_database(),
             nt.nspname,
@@ -1312,14 +1312,14 @@ def get_view_info(cursor: TextIO) -> List[str]:
                 JOIN pg_catalog.pg_namespace AS vn ON (
                     vn.oid = vc.relnamespace AND
                     vn.nspname NOT IN ('information_schema') AND
-                    vn.nspname NOT LIKE 'pg!_%' ESCAPE '!'
+                    vn.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND vn.nspname != 'pgtap'
                 )
                 JOIN pg_catalog.pg_depend AS d ON (r.oid = d.objid)
                 JOIN pg_catalog.pg_class AS tc ON (tc.oid = d.refobjid AND tc.relname != vc.relname) -- Prevents tap_funky from being included.
                 JOIN pg_catalog.pg_namespace AS tn ON (
                     tn.oid = tc.relnamespace AND
                     tn.nspname NOT IN ('information_schema') AND
-                    tn.nspname NOT LIKE 'pg!_%' ESCAPE '!'
+                    tn.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND tn.nspname != 'pgtap'
                 )
         ) AS subquery
         GROUP BY
@@ -1375,7 +1375,7 @@ def get_foreign_table_info(cursor: TextIO) -> List[str]:
             JOIN pg_catalog.pg_namespace AS n ON (
                 n.oid = c.relnamespace AND
                 n.nspname NOT IN ( 'information_schema' ) AND
-                n.nspname NOT LIKE 'pg!_%' ESCAPE '!'
+                n.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND n.nspname != 'pgtap'
             )
         WHERE
             c.relkind = 'f'
@@ -1494,7 +1494,7 @@ def get_function_info(cursor: TextIO) -> List[str]:
                 JOIN pg_catalog.pg_language AS l ON ( l.oid = p.prolang )
             WHERE
                 n.nspname NOT IN ( 'information_schema' ) AND
-                n.nspname NOT LIKE 'pg!_%' ESCAPE '!'
+                n.nspname NOT LIKE 'pg!_%' ESCAPE '!' AND n.nspname != 'pgtap'
             ORDER BY
                 proc_oid,
                 nr
