@@ -11,7 +11,6 @@ from src.helpers import (
 )
 from src.writers.write_pgtap_tests import (
     write_has_column,
-    write_has_index,
     write_has_role,
     write_has_schema,
     write_has_table,

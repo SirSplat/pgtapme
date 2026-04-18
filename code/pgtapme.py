@@ -28,7 +28,7 @@ def main() -> None:
     except KeyError as e:
         logging.error(f"Missing or invalid config key: {e}")
         return
-    except Exception as e:
+    except Exception:
         logging.error(
             "An unexpected error occurred while loading the config.", exc_info=True
         )
