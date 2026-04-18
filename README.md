@@ -91,15 +91,37 @@ The output of this is:
       --db-port DATABASE_PORT
                             Override database port
 
+## Initialize the fdw_source database
+
+    docker compose exec -it sqitch_fdw_source sqitch deploy fdw_source --chdir /mnt/migrations
+
+This creates the `fdw_source` schema, installs pgTAP, and creates the `fdw_source.remote_items` table in the `fdw_source` database.
+
+## Deploy the FDW objects into pgtapme (postgres_fdw extension, server, user mapping, foreign table)
+
+The base sqitch plan already includes these after `@v1.0`. If deploying a fresh cluster, the `sqitch deploy pgtapme` command above will deploy them automatically. If you have an existing `@v1.0` deployment, run:
+
+    docker compose exec -it sqitch sqitch deploy pgtapme --chdir /mnt/migrations
+
+This is idempotent — already-deployed changes are skipped.
+
 ## So lets create the pgTAP style tests for our pgtapme database
 
     docker compose exec -it app python pgtapme.py
 
 By default pgtapme.py does not produce output, unless something went wrong or you passed the --log-level argument
 
+## So lets create the pgTAP style tests for our fdw_source database
+
+    docker compose exec -it app python pgtapme.py --db-host fdw_source --db-name fdw_source
+
 ## Testing pgtapme.py output, does it match our sqitch deployed database
 
     docker compose exec -it pg_prove pg_prove --ext .sql -r -U dbo -h pgtapme_db -d pgtapme -p 5432 -f /mnt/tests/pgtapme
+
+## Testing pgtapme.py output for fdw_source
+
+    docker compose exec -it pg_prove pg_prove --ext .sql -r -U dbo -h fdw_source -d fdw_source -p 5432 -f /mnt/tests/fdw_source
 
 This should produce output similar to:
 

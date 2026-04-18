@@ -12,6 +12,8 @@ services:
     depends_on:
       pgtapme_db:
         condition: service_healthy
+      fdw_source:
+        condition: service_healthy
     command: [ "tail", "-f", "/dev/null" ] # Keeps the container running for devcontainer usage
 
   pgtapme_db:
@@ -34,9 +36,29 @@ services:
       retries: 24
       start_period: 5s
 
+  fdw_source:
+    build:
+      context: ./db/fdw_source
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${PGTAPME_DB_PASSWORD:-mysecretpassword}
+      POSTGRES_DB: postgres
+    user: postgres
+    ports:
+      - "5435:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+      start_period: 5s
+
   sqitch:
     image: sqitch/sqitch
     user: sqitch
+    environment:
+      PGPASSWORD: ${PGTAPME_DB_PASSWORD:-mysecretpassword}
     volumes:
       - ./sqitch/.sqitch/sqitch.conf:/home/.sqitch/sqitch.conf
       - ./.pgpass:/home/.pgpass:ro
@@ -48,6 +70,24 @@ services:
     command: -c "tail -f /dev/null"
     depends_on:
       pgtapme_db:
+        condition: service_healthy
+      fdw_source:
+        condition: service_healthy
+
+  sqitch_fdw_source:
+    image: sqitch/sqitch
+    user: sqitch
+    environment:
+      PGPASSWORD: ${PGTAPME_DB_PASSWORD:-mysecretpassword}
+    volumes:
+      - ./sqitch/.sqitch/sqitch.conf:/home/.sqitch/sqitch.conf
+      - ./.pgpass:/home/.pgpass:ro
+      - ./sqitch/projects/fdw_source/:/mnt/migrations/
+    working_dir: /mnt/migrations
+    entrypoint: /bin/bash
+    command: -c "tail -f /dev/null"
+    depends_on:
+      fdw_source:
         condition: service_healthy
 
   pg_prove:
@@ -61,4 +101,6 @@ services:
     command: -c "tail -f /dev/null"
     depends_on:
       pgtapme_db:
+        condition: service_healthy
+      fdw_source:
         condition: service_healthy

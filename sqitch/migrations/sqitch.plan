@@ -45,3 +45,6 @@ rules/d_date_rule_create_update_rule [appschema tables/d_date_rule tables/d_date
 rules/d_date_rule_create_delete_rule [appschema tables/d_date_rule tables/d_date_rule_create_partitions] 2024-07-02T10:50:31Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_rule create delete rule.
 data/d_date_rule_populate_partitions [appschema tables/d_date_rule rules/d_date_rule_create_insert_rule rules/d_date_rule_create_update_rule rules/d_date_rule_create_delete_rule] 2024-07-02T11:27:40Z dbo <dbo@pgtapme.com> # Add pgtapme.d_date_rule data.
 @v1.0 2024-07-02T11:37:18Z dbo <dbo@pgtapme.com> # Tag v1.0 of pgtapme.py development database
+servers/fdw_source_server 2026-04-18T10:01:00Z sqitch <sqitch@pgtapme> # Create foreign server pointing to fdw_source database.
+user_mappings/dbo_fdw_source [servers/fdw_source_server] 2026-04-18T10:02:00Z sqitch <sqitch@pgtapme> # Create user mapping for dbo on fdw_source_server.
+foreign_tables/remote_items [user_mappings/dbo_fdw_source] 2026-04-18T10:03:00Z sqitch <sqitch@pgtapme> # Create foreign table pgtapme.remote_items mapped to fdw_source.

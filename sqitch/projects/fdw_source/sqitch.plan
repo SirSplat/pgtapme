@@ -1,0 +1,8 @@
+%syntax-version=1.0.0
+%project=fdw_source
+%uri=https://github.com/SirSplat/pgtapme.git
+
+
+appschema 2026-04-18T10:00:00Z sqitch <sqitch@pgtapme> # Add fdw_source application schema.
+pgtap_ext [appschema] 2026-04-18T10:01:00Z sqitch <sqitch@pgtapme> # Install pgTAP extension.
+tables/remote_items [appschema] 2026-04-18T10:02:00Z sqitch <sqitch@pgtapme> # Add fdw_source.remote_items table.

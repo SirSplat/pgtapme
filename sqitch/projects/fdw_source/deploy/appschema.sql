@@ -1,0 +1,19 @@
+-- Deploy fdw_source:appschema to pg
+
+BEGIN;
+
+CREATE SCHEMA fdw_source;
+
+ALTER DEFAULT PRIVILEGES
+    IN SCHEMA fdw_source
+    REVOKE ALL
+    ON TABLES
+    FROM PUBLIC;
+
+ALTER DEFAULT PRIVILEGES
+    IN SCHEMA fdw_source
+    REVOKE ALL
+    ON SEQUENCES
+    FROM PUBLIC;
+
+COMMIT;
