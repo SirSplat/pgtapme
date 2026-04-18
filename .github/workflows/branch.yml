@@ -5,12 +5,20 @@ on:
     branches-ignore:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: Lint (ruff)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
       - name: Install ruff
         run: pip install ruff
@@ -28,9 +36,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
       - name: Install system dependencies
-        run: sudo apt-get install -y libpq-dev
+        run: sudo apt-get update -y && sudo apt-get install -y libpq-dev
 
       - name: Install dependencies
         run: pip install -r app/requirements.txt pytest
