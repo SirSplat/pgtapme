@@ -5,6 +5,13 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
+concurrency:
+  group: master-ci
+  cancel-in-progress: false
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
