@@ -53,8 +53,8 @@ def write_select_for_schema_name(
 @log_function_call
 def write_tests_header(f: TextIOWrapper) -> None:
     logging.debug(f"Writing tests header to file: {getattr(f, 'name', '<buffer>')}")
-    f.write(f"BEGIN;\n")
-    f.write(f"  SELECT plan(0);\n\n")
+    f.write("BEGIN;\n")
+    f.write("  SELECT plan(0);\n\n")
     logging.debug("Tests header written successfully.")
 
 
@@ -1542,5 +1542,5 @@ def write_hasnt_index(
 
 @log_function_call
 def write_tests_footer(f: TextIOWrapper) -> None:
-    f.write(f"  SELECT * FROM finish();\n")
-    f.write(f"ROLLBACK;\n")
+    f.write("  SELECT * FROM finish();\n")
+    f.write("ROLLBACK;\n")

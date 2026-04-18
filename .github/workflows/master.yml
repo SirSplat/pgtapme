@@ -1,19 +1,26 @@
-name: CI
+name: Master CI
 
 on:
   push:
     branches:
-      - main
-  pull_request:
-  workflow_dispatch:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: master-ci
+  cancel-in-progress: false
 
 jobs:
   build-and-test:
+    name: Build and test
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
       PGTAPME_DB_USER: dbo
       PGTAPME_DB_PASSWORD: ${{ secrets.PGTAPME_DB_PASSWORD || 'mysecretpassword' }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,17 +28,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Configure pgpass credentials
-        run: |
-          cat <<'PGPASS' > .pgpass
-          *:*:*:${PGTAPME_DB_USER}:${PGTAPME_DB_PASSWORD}
-          PGPASS
-          chmod 600 .pgpass
-
       - name: Prepare generated tests directory
         run: |
           mkdir -p code/pgtapme_generated_files
-          chmod 777 code/pgtapme_generated_files
+          chmod 775 code/pgtapme_generated_files
 
       - name: Build containers
         run: docker compose build
@@ -76,8 +76,11 @@ jobs:
           docker compose ps
           exit 1
 
-      - name: Deploy database schema with Sqitch
+      - name: Deploy Sqitch pgtapme
         run: docker compose exec -T sqitch env PGUSER=${PGTAPME_DB_USER} PGPASSWORD=${PGTAPME_DB_PASSWORD} sqitch deploy pgtapme --chdir /mnt/migrations
+
+      - name: Deploy Sqitch fdw_source
+        run: docker compose exec -T sqitch_fdw_source env PGUSER=${PGTAPME_DB_USER} PGPASSWORD=${PGTAPME_DB_PASSWORD} sqitch deploy fdw_source --chdir /mnt/migrations
 
       - name: Generate pgTAP tests
         run: docker compose exec -T app python pgtapme.py --db-name pgtapme --db-user ${PGTAPME_DB_USER} --db-password ${PGTAPME_DB_PASSWORD} --db-host pgtapme_db --db-port 5432
@@ -85,8 +88,11 @@ jobs:
       - name: Run pgTAP suite with pg_prove
         run: docker compose exec -T pg_prove env PGPASSWORD=${PGTAPME_DB_PASSWORD} pg_prove --ext .sql -r -U ${PGTAPME_DB_USER} -h pgtapme_db -d pgtapme -p 5432 -f /mnt/tests/pgtapme
 
-      - name: Verify database with Sqitch
+      - name: Verify Sqitch pgtapme
         run: docker compose exec -T sqitch env PGUSER=${PGTAPME_DB_USER} PGPASSWORD=${PGTAPME_DB_PASSWORD} sqitch verify pgtapme --chdir /mnt/migrations
+
+      - name: Verify Sqitch fdw_source
+        run: docker compose exec -T sqitch_fdw_source env PGUSER=${PGTAPME_DB_USER} PGPASSWORD=${PGTAPME_DB_PASSWORD} sqitch verify fdw_source --chdir /mnt/migrations
 
       - name: Collect Docker logs
         if: failure()
@@ -104,9 +110,6 @@ jobs:
         run: |
           if [ -d code/pgtapme_generated_files ] && [ "$(find code/pgtapme_generated_files -type f | head -n1)" ]; then
             tar -czf pgtapme-generated-tests.tar.gz -C code pgtapme_generated_files
-          else
-            echo "No generated pgTAP files found; uploading empty archive"
-            tar -czf pgtapme-generated-tests.tar.gz --files-from /dev/null
           fi
 
       - name: Upload generated pgTAP files

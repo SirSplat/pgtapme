@@ -260,7 +260,7 @@ def replace_test_count(file_path, test_count):
 
         logging.debug(f"Replacing test count in file: {file_path}")
 
-        content = content.replace(f"(0)", f"({test_count})")
+        content = content.replace("(0)", f"({test_count})")
 
         logging.debug(f"Writing updated content to file: {file_path}")
 

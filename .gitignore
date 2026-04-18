@@ -1,3 +1,5 @@
+.worktrees/
+
 # Ignore Python cache files
 __pycache__/
 src/writers/__pycache__/

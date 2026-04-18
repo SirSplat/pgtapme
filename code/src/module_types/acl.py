@@ -12,7 +12,7 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
     return
     for data in get_acl_info(cursor):
         if not data:
-            logging.error(f"There was a problem with the {test_type}, {data}")
+            logging.error(f"There was a problem with the {module_type}, {data}")
             return
 
         test_file_path = create_file_path(output_dir, "???")
@@ -21,7 +21,7 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
             with open(test_file_path, "w") as f:
                 write_tests(f)
         except Exception as e:
-            logging.error(f"Failed to generate tests for {test_type}: {e}.")
+            logging.error(f"Failed to generate tests for {module_type}: {e}.")
 
         set_plan_count(test_file_path)
 
