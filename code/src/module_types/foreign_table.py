@@ -2,13 +2,14 @@ import logging
 from typing import TextIO
 from io import TextIOWrapper
 
-from src.getters.get_catalog_data import get_foreign_table_info
+from src.getters.get_catalog_data import get_foreign_table_info, get_foreign_table_privs
 from src.helpers import create_file_path, log_function_call, set_plan_count
 from src.writers.write_pgtap_tests import (
     write_foreign_table_owner_is,
     write_has_foreign_table,
     write_has_role,
     write_has_schema,
+    write_table_privs_are,
     write_tests_footer,
     write_tests_header,
 )
@@ -31,6 +32,8 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
             data.ft_name,
         )
 
+        privs = get_foreign_table_privs(cursor, data.ft_schema, data.ft_name)
+
         try:
             with open(file_path, "w") as f:
                 write_tests(
@@ -38,6 +41,7 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
                     ft_schema=data.ft_schema,
                     ft_name=data.ft_name,
                     ft_owner=data.ft_owner,
+                    privs_are=privs,
                 )
         except Exception as e:
             logging.error(f"Failed to generate tests for {module_type}: {e}.")
@@ -46,12 +50,15 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
 
 
 @log_function_call
-def write_tests(f: TextIOWrapper, ft_schema: str, ft_name: str, ft_owner: str) -> None:
+def write_tests(f: TextIOWrapper, ft_schema: str, ft_name: str, ft_owner: str, privs_are=None) -> None:
     write_tests_header(f)
 
     write_has_schema(f, ft_schema)
     write_has_foreign_table(f, ft_schema, ft_name)
     write_has_role(f, ft_owner)
     write_foreign_table_owner_is(f, ft_schema, ft_name, ft_owner)
+
+    for priv in (privs_are or []):
+        write_table_privs_are(f, ft_schema, ft_name, priv.role_name, priv.privileges)
 
     write_tests_footer(f)

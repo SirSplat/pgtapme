@@ -433,7 +433,7 @@ def get_partitions_are(
     cursor.execute(
         """
         SELECT
-            ARRAY_AGG( n.nspname || '.' || c2.relname ) AS partitions_are
+            ARRAY_AGG( c2.relname ORDER BY c2.relname ) AS partitions_are
         FROM
             pg_class c1
             JOIN pg_catalog.pg_inherits I ON ( i.inhparent = c1.oid )
@@ -1626,7 +1626,7 @@ def get_sequence_privs(cursor: TextIO, schema_name: str, sequence_name: str) -> 
             ARRAY_AGG(a.privilege_type ORDER BY a.privilege_type) AS privileges
         FROM pg_catalog.pg_class c
         JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-        CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl, acldefault('r', c.relowner)))
+        CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl, acldefault('s', c.relowner)))
             AS a(grantor, grantee, privilege_type, is_grantable)
         JOIN pg_catalog.pg_roles r ON r.oid = a.grantee
         WHERE n.nspname = %s AND c.relname = %s AND c.relkind = 'S'
@@ -1654,6 +1654,7 @@ def get_table_privs(cursor: TextIO, schema_name: str, table_name: str) -> List:
             AS a(grantor, grantee, privilege_type, is_grantable)
         JOIN pg_catalog.pg_roles r ON r.oid = a.grantee
         WHERE n.nspname = %s AND c.relname = %s AND c.relkind IN ('r', 'p')
+            AND a.privilege_type != 'MAINTAIN'
         GROUP BY r.rolname ORDER BY r.rolname
         """,
         (schema_name, table_name),
@@ -1772,6 +1773,111 @@ def get_policy_info(cursor: TextIO, schema_name: str, table_name: str) -> List:
     logging.debug(f"Query executed successfully, records fetched: {records}")
     if not records:
         logging.warning(f"No policy info found for: {schema_name}.{table_name}")
+    return records
+
+
+@log_function_call
+def get_fdw_info(cursor: TextIO) -> List:
+    logging.debug("Executing query to get foreign data wrapper info.")
+    cursor.execute(
+        """
+        SELECT fdwname AS fdw_name
+        FROM pg_catalog.pg_foreign_data_wrapper
+        ORDER BY fdwname
+        """
+    )
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No foreign data wrapper info found.")
+    return records
+
+
+@log_function_call
+def get_fdw_privs(cursor: TextIO, fdw_name: str) -> List:
+    logging.debug(f"Executing query to get FDW privileges for: {fdw_name}")
+    cursor.execute(
+        """
+        SELECT r.rolname AS role_name,
+            ARRAY_AGG(a.privilege_type ORDER BY a.privilege_type) AS privileges
+        FROM pg_catalog.pg_foreign_data_wrapper w
+        CROSS JOIN LATERAL aclexplode(COALESCE(w.fdwacl, acldefault('F', w.fdwowner)))
+            AS a(grantor, grantee, privilege_type, is_grantable)
+        JOIN pg_catalog.pg_roles r ON r.oid = a.grantee
+        WHERE w.fdwname = %s
+        GROUP BY r.rolname ORDER BY r.rolname
+        """,
+        (fdw_name,),
+    )
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No FDW privilege info found for: {fdw_name}")
+    return records
+
+
+@log_function_call
+def get_foreign_server_info(cursor: TextIO) -> List:
+    logging.debug("Executing query to get foreign server info.")
+    cursor.execute(
+        """
+        SELECT srvname AS server_name
+        FROM pg_catalog.pg_foreign_server
+        ORDER BY srvname
+        """
+    )
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning("No foreign server info found.")
+    return records
+
+
+@log_function_call
+def get_server_privs(cursor: TextIO, server_name: str) -> List:
+    logging.debug(f"Executing query to get server privileges for: {server_name}")
+    cursor.execute(
+        """
+        SELECT r.rolname AS role_name,
+            ARRAY_AGG(a.privilege_type ORDER BY a.privilege_type) AS privileges
+        FROM pg_catalog.pg_foreign_server s
+        CROSS JOIN LATERAL aclexplode(COALESCE(s.srvacl, acldefault('S', s.srvowner)))
+            AS a(grantor, grantee, privilege_type, is_grantable)
+        JOIN pg_catalog.pg_roles r ON r.oid = a.grantee
+        WHERE s.srvname = %s
+        GROUP BY r.rolname ORDER BY r.rolname
+        """,
+        (server_name,),
+    )
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No server privilege info found for: {server_name}")
+    return records
+
+
+@log_function_call
+def get_foreign_table_privs(cursor: TextIO, schema_name: str, table_name: str) -> List:
+    logging.debug(f"Executing query to get foreign table privileges for: {schema_name}.{table_name}")
+    cursor.execute(
+        """
+        SELECT r.rolname AS role_name,
+            ARRAY_AGG(a.privilege_type ORDER BY a.privilege_type) AS privileges
+        FROM pg_catalog.pg_class c
+        JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+        CROSS JOIN LATERAL aclexplode(COALESCE(c.relacl, acldefault('r', c.relowner)))
+            AS a(grantor, grantee, privilege_type, is_grantable)
+        JOIN pg_catalog.pg_roles r ON r.oid = a.grantee
+        WHERE n.nspname = %s AND c.relname = %s AND c.relkind = 'f'
+            AND a.privilege_type != 'MAINTAIN'
+        GROUP BY r.rolname ORDER BY r.rolname
+        """,
+        (schema_name, table_name),
+    )
+    records = cursor.fetchall()
+    logging.debug(f"Query executed successfully, records fetched: {records}")
+    if not records:
+        logging.warning(f"No foreign table privilege info found for: {schema_name}.{table_name}")
     return records
 
 

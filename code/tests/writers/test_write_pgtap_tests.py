@@ -156,6 +156,8 @@ from src.writers.write_pgtap_tests import (
     write_hasnt_rightop,
     write_hasnt_opclass,
     write_hasnt_tablespace,
+    write_fdw_privs_are,
+    write_server_privs_are,
 )
 
 
@@ -1060,3 +1062,13 @@ def test_write_hasnt_tablespace(buf):
     assert output(buf) == "  SELECT hasnt_tablespace('old_ts', 'Tablespace old_ts should not exist.');\n\n"
 
 
+
+
+def test_write_fdw_privs_are(buf):
+    write_fdw_privs_are(buf, "postgres_fdw", "dbo", ["USAGE"])
+    assert output(buf) == "  SELECT fdw_privs_are('postgres_fdw', 'dbo', ARRAY['USAGE']::TEXT[], 'FDW postgres_fdw should have the correct privileges for dbo.');\n\n"
+
+
+def test_write_server_privs_are(buf):
+    write_server_privs_are(buf, "fdw_source_server", "dbo", ["USAGE"])
+    assert output(buf) == "  SELECT server_privs_are('fdw_source_server', 'dbo', ARRAY['USAGE']::TEXT[], 'Server fdw_source_server should have the correct privileges for dbo.');\n\n"

@@ -1267,6 +1267,26 @@ def write_tablespace_privs_are(
 
 
 @log_function_call
+def write_fdw_privs_are(
+    f: TextIOWrapper, fdw_name: str, role: str, privileges: list
+) -> None:
+    array_str = format_array_parameter(privileges)
+    f.write(
+        f"  SELECT fdw_privs_are('{fdw_name}', '{role}', {array_str}, 'FDW {fdw_name} should have the correct privileges for {role}.');\n\n"
+    )
+
+
+@log_function_call
+def write_server_privs_are(
+    f: TextIOWrapper, server_name: str, role: str, privileges: list
+) -> None:
+    array_str = format_array_parameter(privileges)
+    f.write(
+        f"  SELECT server_privs_are('{server_name}', '{role}', {array_str}, 'Server {server_name} should have the correct privileges for {role}.');\n\n"
+    )
+
+
+@log_function_call
 def write_policies_are(
     f: TextIOWrapper, schema: str, table: str, policies: list
 ) -> None:

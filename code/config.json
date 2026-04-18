@@ -20,6 +20,8 @@
         "foreign_table",
         "function",
         "enum",
-        "domain"
+        "domain",
+        "fdw",
+        "foreign_server"
     ]
 }
