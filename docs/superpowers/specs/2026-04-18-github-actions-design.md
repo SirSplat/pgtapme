@@ -42,7 +42,7 @@ Three jobs run in parallel on `ubuntu-latest`. Expected runtime: under 2 minutes
 | Job | Steps |
 |-----|-------|
 | `lint` | checkout → install ruff → `ruff check code/` |
-| `test` | checkout → setup Python → install `app/requirements.txt` + pytest + ruff → `pytest code/tests/` |
+| `test` | checkout → setup Python → install `app/requirements.txt` + pytest → `pytest code/tests/` |
 | `build` | checkout → setup Docker Buildx → `docker compose build` |
 
 ## Master Pipeline (`master.yml`)
