@@ -290,3 +290,17 @@ def test_policy_info_writes_policy_roles_are():
     p = PolicyInfo(policy_name="allow_select", policy_roles=["dbo"], policy_cmd="SELECT")
     out = call_write_tests(policies_are=["allow_select"], policy_info=[p])
     assert "SELECT policy_roles_are(" in out
+
+
+# ---------------------------------------------------------------------------
+# is_indexed
+# ---------------------------------------------------------------------------
+
+def test_table_with_indexes_writes_is_indexed():
+    out = call_write_tests(indexes_are=["my_idx"])
+    assert "SELECT is_indexed(" in out
+
+
+def test_table_without_indexes_omits_is_indexed():
+    out = call_write_tests(indexes_are=[])
+    assert "SELECT is_indexed(" not in out

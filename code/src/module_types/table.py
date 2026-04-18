@@ -38,6 +38,7 @@ from src.writers.write_pgtap_tests import (
     write_hasnt_inherited_tables,
     write_hasnt_pk,
     write_indexes_are,
+    write_is_indexed,
     write_is_ancestor_of,
     write_is_descendent_of,
     write_is_partition_of,
@@ -113,6 +114,8 @@ def write_tests(
 
     indexes_are = get_indexes_are(cursor, schema_name, table_name)
     write_indexes_are(f, schema_name, table_name, indexes_are)
+    if indexes_are:
+        write_is_indexed(f, schema_name, table_name)
 
     triggers_are = get_triggers_are(cursor, schema_name, table_name)
     write_triggers_are(f, schema_name, table_name, triggers_are)

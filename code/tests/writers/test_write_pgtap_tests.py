@@ -122,6 +122,29 @@ from src.writers.write_pgtap_tests import (
     write_policies_are,
     write_policy_roles_are,
     write_policy_cmd_is,
+    write_is_partition_of,
+    write_index_owner_is,
+    write_type_owner_is,
+    write_domain_type_is,
+    write_has_domain,
+    write_hasnt_schema,
+    write_hasnt_table,
+    write_hasnt_view,
+    write_hasnt_materialized_view,
+    write_hasnt_sequence,
+    write_hasnt_foreign_table,
+    write_hasnt_type,
+    write_hasnt_domain,
+    write_hasnt_enum,
+    write_hasnt_function,
+    write_hasnt_role,
+    write_hasnt_language,
+    write_hasnt_cast,
+    write_is_indexed,
+    write_hasnt_column,
+    write_hasnt_trigger,
+    write_hasnt_rule,
+    write_hasnt_index,
 )
 
 
@@ -836,5 +859,130 @@ def test_write_policy_roles_are(buf):
 def test_write_policy_cmd_is(buf):
     write_policy_cmd_is(buf, "public", "my_table", "allow_select", "SELECT")
     assert output(buf) == "  SELECT policy_cmd_is('public', 'my_table', 'allow_select', 'SELECT', 'Policy allow_select on public.my_table should apply to the correct command.');\n\n"
+
+
+# ---------------------------------------------------------------------------
+# Existing writers previously untested
+# ---------------------------------------------------------------------------
+
+def test_write_is_partition_of(buf):
+    from collections import namedtuple
+    Rec = namedtuple("Rec", ["parent_schema", "parent_table"])
+    write_is_partition_of(buf, "public", "child_tbl", Rec("public", "parent_tbl"))
+    assert output(buf) == "  SELECT is_partition_of('public', 'child_tbl', 'public', 'parent_tbl', 'Table public.child_tbl should be a partition.');\n\n"
+
+
+def test_write_index_owner_is(buf):
+    write_index_owner_is(buf, "public", "my_table", "my_idx", "alice")
+    assert output(buf) == "  SELECT index_owner_is('public', 'my_table', 'my_idx', 'alice', 'Index public.my_table.my_idx should have the correct owner.');\n\n"
+
+
+def test_write_type_owner_is(buf):
+    write_type_owner_is(buf, "public", "my_type", "alice")
+    assert output(buf) == "  SELECT type_owner_is('public', 'my_type', 'alice', 'Type public.my_type should have the correct owner.');\n\n"
+
+
+def test_write_domain_type_is(buf):
+    write_domain_type_is(buf, "public", "my_domain", "pg_catalog", "integer")
+    assert output(buf) == "  SELECT domain_type_is('public', 'my_domain', 'pg_catalog', 'integer', 'Domain public.my_domain should have the correct type.');\n\n"
+
+
+def test_write_has_domain(buf):
+    write_has_domain(buf, "public", "my_domain")
+    assert output(buf) == "  SELECT has_domain('public', 'my_domain', 'Domain public.my_domain should exist.');\n\n"
+
+
+# ---------------------------------------------------------------------------
+# hasnt_* writers — absence assertions
+# ---------------------------------------------------------------------------
+
+def test_write_hasnt_schema(buf):
+    write_hasnt_schema(buf, "old_schema")
+    assert output(buf) == "  SELECT hasnt_schema('old_schema', 'Schema old_schema should not exist.');\n\n"
+
+
+def test_write_hasnt_table(buf):
+    write_hasnt_table(buf, "public", "dropped_tbl")
+    assert output(buf) == "  SELECT hasnt_table('public', 'dropped_tbl', 'Table public.dropped_tbl should not exist.');\n\n"
+
+
+def test_write_hasnt_view(buf):
+    write_hasnt_view(buf, "public", "old_view")
+    assert output(buf) == "  SELECT hasnt_view('public', 'old_view', 'View public.old_view should not exist.');\n\n"
+
+
+def test_write_hasnt_materialized_view(buf):
+    write_hasnt_materialized_view(buf, "public", "old_mv")
+    assert output(buf) == "  SELECT hasnt_materialized_view('public', 'old_mv', 'Materialized view public.old_mv should not exist.');\n\n"
+
+
+def test_write_hasnt_sequence(buf):
+    write_hasnt_sequence(buf, "public", "old_seq")
+    assert output(buf) == "  SELECT hasnt_sequence('public', 'old_seq', 'Sequence public.old_seq should not exist.');\n\n"
+
+
+def test_write_hasnt_foreign_table(buf):
+    write_hasnt_foreign_table(buf, "public", "old_ft")
+    assert output(buf) == "  SELECT hasnt_foreign_table('public', 'old_ft', 'Foreign table public.old_ft should not exist.');\n\n"
+
+
+def test_write_hasnt_type(buf):
+    write_hasnt_type(buf, "public", "old_type")
+    assert output(buf) == "  SELECT hasnt_type('public', 'old_type', 'Type public.old_type should not exist.');\n\n"
+
+
+def test_write_hasnt_domain(buf):
+    write_hasnt_domain(buf, "public", "old_domain")
+    assert output(buf) == "  SELECT hasnt_domain('public', 'old_domain', 'Domain public.old_domain should not exist.');\n\n"
+
+
+def test_write_hasnt_enum(buf):
+    write_hasnt_enum(buf, "public", "old_enum")
+    assert output(buf) == "  SELECT hasnt_enum('public', 'old_enum', 'ENUM public.old_enum should not exist.');\n\n"
+
+
+def test_write_hasnt_function(buf):
+    write_hasnt_function(buf, "public", "old_fn", ["integer", "text"])
+    assert output(buf) == "  SELECT hasnt_function('public', 'old_fn', ARRAY['integer', 'text']::TEXT[], 'Function public.old_fn should not exist.');\n\n"
+
+
+def test_write_hasnt_role(buf):
+    write_hasnt_role(buf, "old_role")
+    assert output(buf) == "  SELECT hasnt_role('old_role', 'Role old_role should not exist.');\n\n"
+
+
+def test_write_hasnt_language(buf):
+    write_hasnt_language(buf, "plperl")
+    assert output(buf) == "  SELECT hasnt_language('plperl', 'Language plperl should not exist.');\n\n"
+
+
+def test_write_hasnt_cast(buf):
+    write_hasnt_cast(buf, "integer", "text")
+    assert output(buf) == "  SELECT hasnt_cast('integer', 'text', 'Cast integer->text should not exist.');\n\n"
+
+
+def test_write_is_indexed(buf):
+    write_is_indexed(buf, "public", "my_table")
+    assert output(buf) == "  SELECT is_indexed('public', 'my_table', 'Table public.my_table should be indexed.');\n\n"
+
+
+def test_write_hasnt_column(buf):
+    write_hasnt_column(buf, "public", "my_table", "old_col")
+    assert output(buf) == "  SELECT hasnt_column('public', 'my_table', 'old_col', 'Column public.my_table.old_col should not exist.');\n\n"
+
+
+def test_write_hasnt_trigger(buf):
+    write_hasnt_trigger(buf, "public", "my_table", "old_trg")
+    assert output(buf) == "  SELECT hasnt_trigger('public', 'my_table', 'old_trg', 'Trigger old_trg on public.my_table should not exist.');\n\n"
+
+
+def test_write_hasnt_rule(buf):
+    write_hasnt_rule(buf, "public", "my_table", "old_rule")
+    assert output(buf) == "  SELECT hasnt_rule('public', 'my_table', 'old_rule', 'Rule old_rule on public.my_table should not exist.');\n\n"
+
+
+def test_write_hasnt_index(buf):
+    write_hasnt_index(buf, "public", "my_table", "old_idx")
+    assert output(buf) == "  SELECT hasnt_index('public', 'my_table', 'old_idx', 'Index public.my_table.old_idx should not exist.');\n\n"
 
 

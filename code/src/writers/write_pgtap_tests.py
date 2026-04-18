@@ -1297,6 +1297,143 @@ def write_policy_cmd_is(
 
 
 @log_function_call
+def write_hasnt_schema(f: TextIOWrapper, schema_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_schema('{schema_name}', 'Schema {schema_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_table(f: TextIOWrapper, schema_name: str, table_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_table('{schema_name}', '{table_name}', 'Table {schema_name}.{table_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_view(f: TextIOWrapper, schema_name: str, view_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_view('{schema_name}', '{view_name}', 'View {schema_name}.{view_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_materialized_view(f: TextIOWrapper, schema_name: str, mv_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_materialized_view('{schema_name}', '{mv_name}', 'Materialized view {schema_name}.{mv_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_sequence(f: TextIOWrapper, schema_name: str, seq_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_sequence('{schema_name}', '{seq_name}', 'Sequence {schema_name}.{seq_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_foreign_table(f: TextIOWrapper, schema_name: str, ft_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_foreign_table('{schema_name}', '{ft_name}', 'Foreign table {schema_name}.{ft_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_type(f: TextIOWrapper, schema_name: str, type_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_type('{schema_name}', '{type_name}', 'Type {schema_name}.{type_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_domain(f: TextIOWrapper, schema_name: str, domain_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_domain('{schema_name}', '{domain_name}', 'Domain {schema_name}.{domain_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_enum(f: TextIOWrapper, schema_name: str, enum_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_enum('{schema_name}', '{enum_name}', 'ENUM {schema_name}.{enum_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_function(
+    f: TextIOWrapper, schema_name: str, func_name: str, func_args: List[str] = None
+) -> None:
+    array_str = format_array_parameter(func_args)
+    f.write(
+        f"  SELECT hasnt_function('{schema_name}', '{func_name}', {array_str}, 'Function {schema_name}.{func_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_role(f: TextIOWrapper, role_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_role('{role_name}', 'Role {role_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_language(f: TextIOWrapper, lang_name: str) -> None:
+    f.write(
+        f"  SELECT hasnt_language('{lang_name}', 'Language {lang_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_cast(f: TextIOWrapper, source_type: str, target_type: str) -> None:
+    f.write(
+        f"  SELECT hasnt_cast('{source_type}', '{target_type}', 'Cast {source_type}->{target_type} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_is_indexed(f: TextIOWrapper, schema_name: str, table_name: str) -> None:
+    f.write(
+        f"  SELECT is_indexed('{schema_name}', '{table_name}', 'Table {schema_name}.{table_name} should be indexed.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_column(
+    f: TextIOWrapper, schema_name: str, table_name: str, column_name: str
+) -> None:
+    f.write(
+        f"  SELECT hasnt_column('{schema_name}', '{table_name}', '{column_name}', 'Column {schema_name}.{table_name}.{column_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_trigger(
+    f: TextIOWrapper, schema_name: str, table_name: str, trigger_name: str
+) -> None:
+    f.write(
+        f"  SELECT hasnt_trigger('{schema_name}', '{table_name}', '{trigger_name}', 'Trigger {trigger_name} on {schema_name}.{table_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_rule(
+    f: TextIOWrapper, schema_name: str, table_name: str, rule_name: str
+) -> None:
+    f.write(
+        f"  SELECT hasnt_rule('{schema_name}', '{table_name}', '{rule_name}', 'Rule {rule_name} on {schema_name}.{table_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
+def write_hasnt_index(
+    f: TextIOWrapper, schema_name: str, table_name: str, index_name: str
+) -> None:
+    f.write(
+        f"  SELECT hasnt_index('{schema_name}', '{table_name}', '{index_name}', 'Index {schema_name}.{table_name}.{index_name} should not exist.');\n\n"
+    )
+
+
+@log_function_call
 def write_tests_footer(f: TextIOWrapper) -> None:
     f.write(f"  SELECT * FROM finish();\n")
     f.write(f"ROLLBACK;\n")

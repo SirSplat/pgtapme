@@ -60,3 +60,15 @@ def test_languages_are_written_with_data():
     out = call_write_tests(languages_are=["plpgsql", "sql"])
     assert "SELECT languages_are(" in out
     assert "'plpgsql'" in out
+
+
+def test_groups_are_written_with_data():
+    out = call_write_tests(groups_are=["grp_readonly"])
+    assert "SELECT groups_are(" in out
+    assert "'grp_readonly'" in out
+
+
+def test_casts_are_written_with_data():
+    out = call_write_tests(casts_are=["(integer AS text)"])
+    assert "SELECT casts_are(" in out
+    assert "'(integer AS text)'" in out
