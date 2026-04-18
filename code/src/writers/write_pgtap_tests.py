@@ -47,12 +47,12 @@ def write_select_for_schema_name(
     f.write(
         f"  SELECT {function_name}({schema_clause}{array_str}, '{description}');\n\n"
     )
-    logging.debug(f"SELECT statement written to file: {f.name}")
+    logging.debug(f"SELECT statement written to file: {getattr(f, 'name', '<buffer>')}")
 
 
 @log_function_call
 def write_tests_header(f: TextIOWrapper) -> None:
-    logging.debug(f"Writing tests header to file: {f.name}")
+    logging.debug(f"Writing tests header to file: {getattr(f, 'name', '<buffer>')}")
     f.write(f"BEGIN;\n")
     f.write(f"  SELECT plan(0);\n\n")
     logging.debug("Tests header written successfully.")
@@ -61,7 +61,7 @@ def write_tests_header(f: TextIOWrapper) -> None:
 @log_function_call
 def write_languages_are(f: TextIOWrapper, languages_are: str) -> None:
     logging.debug(
-        f"Writing languages_are statement to file: {f.name} with languages: {languages_are}"
+        f"Writing languages_are statement to file: {getattr(f, 'name', '<buffer>')} with languages: {languages_are}"
     )
     array_str = format_array_parameter(languages_are)
     f.write(
@@ -73,7 +73,7 @@ def write_languages_are(f: TextIOWrapper, languages_are: str) -> None:
 @log_function_call
 def write_tablespaces_are(f: TextIOWrapper, tablespaces_are: str) -> None:
     logging.debug(
-        f"Writing tablespaces_are statement to file: {f.name} with tablespaces: {tablespaces_are}"
+        f"Writing tablespaces_are statement to file: {getattr(f, 'name', '<buffer>')} with tablespaces: {tablespaces_are}"
     )
     array_str = format_array_parameter(tablespaces_are)
     f.write(
@@ -85,7 +85,7 @@ def write_tablespaces_are(f: TextIOWrapper, tablespaces_are: str) -> None:
 @log_function_call
 def write_roles_are(f: TextIOWrapper, roles_are: str) -> None:
     logging.debug(
-        f"Writing roles_are statement to file: {f.name} with roles: {roles_are}"
+        f"Writing roles_are statement to file: {getattr(f, 'name', '<buffer>')} with roles: {roles_are}"
     )
     array_str = format_array_parameter(roles_are)
     f.write(
@@ -97,7 +97,7 @@ def write_roles_are(f: TextIOWrapper, roles_are: str) -> None:
 @log_function_call
 def write_groups_are(f: TextIOWrapper, groups_are: str) -> None:
     logging.debug(
-        f"Writing groups_are statement to file: {f.name} with groups: {groups_are}"
+        f"Writing groups_are statement to file: {getattr(f, 'name', '<buffer>')} with groups: {groups_are}"
     )
     array_str = format_array_parameter(groups_are)
     f.write(
