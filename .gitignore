@@ -7,5 +7,5 @@ src/getters/__pycache__/
 *.pyd
 .vscode
 .pytest_cache
-pgtapme_generated_files
-pg_prove/projects
+code/pgtapme_generated_files
+.pgpass

@@ -1,78 +1,170 @@
-# pgtapme
+# What is this
+pgTAPme is an application written in [Python](https://www.python.org/) which generates [pgTAP](https://pgtap.org/) style tests using a [PostgreSQL](https://www.postgresql.org/) database. It provides a modular and extensible framework to create tests for different aspects of your database schema. These tests can then be executed using the [pg_prove docker image](https://hub.docker.com/r/itheory/pg_prove/).
 
-PGTapMe
+# Why do this (re-invent the wheel)?
+I did this to for a few reasons:
+* To learn [Python](https://www.python.org/)
+* But more so to learn the intricacies of [pgTAP](https://pgtap.org/) (inside [PostgreSQL](https://www.postgresql.org/), not the [Perl](https://www.perl.org/) code)
+* I don't like the output format [pg_tapgen](https://github.com/theory/tap-parser-sourcehandler-pgtap/blob/v3.36/bin/pg_tapgen) produces
+* So I had to learn [pgTAP](https://github.com/theory/tap-parser-sourcehandler-pgtap) and [pg_prove](https://github.com/theory/tap-parser-sourcehandler-pgtap) Perl code anyway :) Learned a lot.
 
-PGtapme is a tool for generating pgTap tests for PostgreSQL databases. It provides a modular and extensible framework to create tests for different aspects of your database schema.
-Configuration
+# How to use this
+## Start the cluster
 
-Before using PGtapme, you need to configure the database connection and set up the types of tests you want to generate. Edit the .env file to include your database connection details and specify the test types you are interested in.
+Before starting the containers ensure you have database credentials available to Docker. Copy the provided template and lock down its permissions:
 
-DATABASE_NAME = dvdrental
-DATABASE_USER = dbo
-DATABASE_USER_PASSWORD = mysecretpassword
-DATABASE_HOST = localhost
-DATABASE_PORT = 5432
+    cp .pgpass.template .pgpass
+    chmod 600 .pgpass
 
-Usage
+The containers default to the password `mysecretpassword`. If you prefer to use a different credential, export `PGTAPME_DB_PASSWORD` (or define it in a `.env` file that Docker Compose can read) and update the copied `.pgpass` entry to match before booting the stack.
 
-To run PGtapme, execute the pgtapme.py script. This script reads the configurations from config.json and the .env files then generates PGTap tests for the specified test types.
+Then launch the stack:
 
-bash
+    docker compose up -d
 
-python pgtapme.py
+## Initialize the pgtapme database, lets first try get the status
 
-Test Types
-Cluster Tests
+    docker compose exec -it sqitch sqitch status pgtapme --chdir /mnt/migrations
 
-The cluster tests focus on various aspects of the PostgreSQL cluster, including tablespaces, roles, groups, users, languages, casts, and extensions.
-Directory Tree
+This will produce output similar to:
 
-csharp
+    # On database pgtapme
+    Database pgtapme has not been initialized for Sqitch
 
-.
-└── cluster
-    ├── cluster.sql
-    ├── languages
-    │   ├── c.sql
-    │   ├── internal.sql
-    │   ├── plpgsql.sql
-    │   └── sql.sql
+## Now initialize the the pgtapme database
 
-Sample Test: cluster/cluster.sql
+    docker compose exec -it sqitch sqitch deploy pgtapme --chdir /mnt/migrations
 
-sql
+This will produce output similar to:
 
-BEGIN;
-  SELECT plan(6);
+    Adding registry tables to pgtapme
+    Deploying changes to pgtapme
+      + appschema ................................................. ok
+      + comments/appschema ........................................ ok
+      + extschema ................................................. ok
+      + comments/extschema ........................................ ok
+      + gist_ext .................................................. ok
+      + comments/gist_ext ......................................... ok
+      + tables/lkp_dow ............................................ ok
+      + comments/lkp_dow .......................................... ok
+      + functions/lkp_dow_populate-date-date ...................... ok
+      + comments/lkp_dow_populate-date-date ....................... ok
+      + tables/lkp_mth ............................................ ok
+      + comments/lkp_mth .......................................... ok
+      .
+      .
+      .
+      + rules/d_date_rule_create_insert_rule ...................... ok
+      + rules/d_date_rule_create_update_rule ...................... ok
+      + rules/d_date_rule_create_delete_rule ...................... ok
+      + data/d_date_rule_populate_partitions @v1.0 ................ ok
 
-  SELECT tablespaces_are(ARRAY['pg_default', 'pg_global']::text[], 'Cluster should have the correct tablespaces.');
+That output is a good thing, you can see the final TAG "@v1.0", this matches the TAG from your sqitch.plan
 
-  SELECT roles_are(ARRAY['pg_database_owner', 'pg_read_all_data', 'pg_write_all_data', 'pg_monitor', 'pg_read_all_settings', 'pg_read_all_stats', 'pg_stat_scan_tables', 'pg_read_server_files', 'pg_write_server_files', 'pg_execute_server_program', 'pg_signal_backend', 'pg_checkpoint', 'postgres', 'dbo', 'dwh_etl', 'datadog']::text[], 'Cluster should have the correct roles.');
+    @v1.0 2024-07-02T11:37:18Z dbo <dbo@pgtapme.com> # Tag v1.0 of pgtapme.py development database
 
-  SELECT groups_are(ARRAY['pg_database_owner', 'pg_read_all_data', 'pg_write_all_data', 'pg_monitor', 'pg_read_all_settings', 'pg_read_all_stats', 'pg_stat_scan_tables', 'pg_read_server_files', 'pg_write_server_files', 'pg_execute_server_program', 'pg_signal_backend', 'pg_checkpoint']::text[], 'Cluster should have the correct groups.');
+## Finally we get to execute the pgtapme.py, lets use the --help argument first
 
-  SELECT users_are(ARRAY['postgres', 'dbo', 'dwh_etl', 'datadog']::text[], 'Cluster should have the correct users.');
+    docker compose exec -it app python pgtapme.py --help
 
-  SELECT languages_are(ARRAY['plpgsql']::text[], 'Cluster should have the correct languages.');
+The output of this is:
 
-  SELECT casts_are(ARRAY['bigint AS smallint', 'bigint AS integer', 'bigint AS real', 'bigint AS double precision', 'bigint AS numeric', 'smallint AS bigint', 'smallint AS integer', 'smallint AS real', 'smallint AS double precision', 'smallint AS numeric', 'integer AS bigint', 'integer AS smallint', 'integer AS real', 'integer AS double precision', 'integer AS numeric', 'real AS bigint', 'real AS smallint', 'real AS integer', 'real AS double precision', 'real AS numeric', 'double precision AS bigint', 'double precision AS smallint', 'double precision AS integer', 'double precision AS real', 'double precision AS numeric', 'numeric AS bigint', 'numeric AS smallint', 'numeric AS integer', 'numeric AS real', 'numeric AS double precision', 'money AS numeric', 'numeric AS money', 'integer AS money', 'bigint AS money', 'integer AS boolean', 'boolean AS integer', 'xid8 AS xid', 'bigint AS oid', 'smallint AS oid', 'integer AS oid', 'oid AS bigint', 'oid AS integer', 'oid AS regproc', 'regproc AS oid', 'bigint AS regproc', 'smallint AS regproc', 'integer AS regproc', 'regproc AS bigint', 'regproc AS integer', 'regproc AS regprocedure', 'regprocedure AS regproc', 'oid AS regprocedure', 'regprocedure AS oid', 'bigint AS regprocedure', 'smallint AS regprocedure', 'integer AS regprocedure', 'regprocedure AS bigint', 'regprocedure AS integer', 'oid AS regoper', 'regoper AS oid', 'bigint AS regoper', 'smallint AS regoper', 'integer AS regoper', 'regoper AS bigint', 'regoper AS integer', 'regoper AS regoperator', 'regoperator AS regoper', 'oid AS regoperator', 'regoperator AS oid', 'bigint AS regoperator', 'smallint AS regoperator', 'integer AS regoperator', 'regoperator AS bigint', 'regoperator AS integer', 'oid AS regclass', 'regclass AS oid', 'bigint AS regclass', 'smallint AS regclass', 'integer AS regclass', 'regclass AS bigint', 'regclass AS integer', 'oid AS regcollation', 'regcollation AS oid', 'bigint AS regcollation', 'smallint AS regcollation', 'integer AS regcollation', 'regcollation AS bigint', 'regcollation AS integer', 'oid AS regtype', 'regtype AS oid', 'bigint AS regtype', 'smallint AS regtype', 'integer AS regtype', 'regtype AS bigint', 'regtype AS integer', 'oid AS regconfig', 'regconfig AS oid', 'bigint AS regconfig', 'smallint AS regconfig', 'integer AS regconfig', 'regconfig AS bigint', 'regconfig AS integer', 'oid AS regdictionary', 'regdictionary AS oid', 'bigint AS regdictionary', 'smallint AS regdictionary', 'integer AS regdictionary', 'regdictionary AS bigint', 'regdictionary AS integer', 'text AS regclass', 'character varying AS regclass', 'oid AS regrole', 'regrole AS oid', 'bigint AS regrole', 'smallint AS regrole', 'integer AS regrole', 'regrole AS bigint', 'regrole AS integer', 'oid AS regnamespace', 'regnamespace AS oid', 'bigint AS regnamespace', 'smallint AS regnamespace', 'integer AS regnamespace', 'regnamespace AS bigint', 'regnamespace AS integer', 'text AS character', 'text AS character varying', 'character AS text', 'character AS character varying', 'character varying AS text', 'character varying AS character', '"char" AS text', '"char" AS character', '"char" AS character varying', 'name AS text', 'name AS character', 'name AS character varying', 'text AS "char"', 'character AS "char"', 'character varying AS "char"', 'text AS name', 'character AS name', 'character varying AS name', '"char" AS integer', 'integer AS "char"', 'pg_node_tree AS text', 'pg_ndistinct AS bytea', 'pg_ndistinct AS text', 'pg_dependencies AS bytea', 'pg_dependencies AS text', 'pg_mcv_list AS bytea', 'pg_mcv_list AS text', 'date AS timestamp without time zone', 'date AS timestamp with time zone', 'time without time zone AS interval', 'time without time zone AS time with time zone', 'timestamp without time zone AS date', 'timestamp without time zone AS time without time zone', 'timestamp without time zone AS timestamp with time zone', 'timestamp with time zone AS date', 'timestamp with time zone AS time without time zone', 'timestamp with time zone AS timestamp without time zone', 'timestamp with time zone AS time with time zone', 'interval AS time without time zone', 'time with time zone AS time without time zone', 'point AS box', 'lseg AS point', 'path AS polygon', 'box AS point', 'box AS lseg', 'box AS polygon', 'box AS circle', 'polygon AS point', 'polygon AS path', 'polygon AS box', 'polygon AS circle', 'circle AS point', 'circle AS box', 'circle AS polygon', 'macaddr AS macaddr8', 'macaddr8 AS macaddr', 'cidr AS inet', 'inet AS cidr', 'bit AS bit varying', 'bit varying AS bit', 'bigint AS bit', 'integer AS bit', 'bit AS bigint', 'bit AS integer', 'cidr AS text', 'inet AS text', 'boolean AS text', 'xml AS text', 'text AS xml', 'cidr AS character varying', 'inet AS character varying', 'boolean AS character varying', 'xml AS character varying', 'character varying AS xml', 'cidr AS character', 'inet AS character', 'boolean AS character', 'xml AS character', 'character AS xml', 'character AS character', 'character varying AS character varying', 'time without time zone AS time without time zone', 'timestamp without time zone AS timestamp without time zone', 'timestamp with time zone AS timestamp with time zone', 'interval AS interval', 'time with time zone AS time with time zone', 'bit AS bit', 'bit varying AS bit varying', 'numeric AS numeric', 'json AS jsonb', 'jsonb AS json', 'jsonb AS boolean', 'jsonb AS numeric', 'jsonb AS smallint', 'jsonb AS integer', 'jsonb AS bigint', 'jsonb AS real', 'jsonb AS double precision', 'int4range AS int4multirange', 'int8range AS int8multirange', 'numrange AS nummultirange', 'daterange AS datemultirange', 'tsrange AS tsmultirange', 'tstzrange AS tstzmultirange']::text[], 'Cluster should have the correct casts.');
+    usage: pgtapme.py [-h] [--log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}] [--module-type MODULE_TYPE] [--db-name DATABASE_NAME] [--db-user DATABASE_USER]
+                  [--db-password DATABASE_USER_PASSWORD] [--db-host DATABASE_HOST] [--db-port DATABASE_PORT]
 
-  SELECT * FROM finish();
-ROLLBACK;
+    Your script description
 
-License
+    options:
+      -h, --help            show this help message and exit
+      --log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}
+                            Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+      --module-type MODULE_TYPE
+                            Override module types
+      --db-name DATABASE_NAME
+                            Override database name
+      --db-user DATABASE_USER
+                            Override database user
+      --db-password DATABASE_USER_PASSWORD
+                            Override database user password
+      --db-host DATABASE_HOST
+                            Override database host
+      --db-port DATABASE_PORT
+                            Override database port
 
-This project is licensed under the MIT License.
+## So lets create the pgTAP style tests for our pgtapme database
 
+    docker compose exec -it app python pgtapme.py
 
+By default pgtapme.py does not produce output, unless something went wrong or you passed the --log-level argument
 
+## Testing pgtapme.py output, does it match our sqitch deployed database
 
+    docker compose exec -it pg_prove pg_prove --ext .sql -r -U dbo -h pgtapme_db -d pgtapme -p 5432 -f /mnt/tests/pgtapme
 
+This should produce output similar to:
 
+    /mnt/tests/pgtapme/cluster/cluster.sql ............................................................................................................................ ok
+    /mnt/tests/pgtapme/cluster/language/c.sql ......................................................................................................................... ok
+    /mnt/tests/pgtapme/cluster/language/internal.sql .................................................................................................................. ok
+    /mnt/tests/pgtapme/cluster/language/plpgsql.sql ................................................................................................................... ok
+    /mnt/tests/pgtapme/cluster/language/sql.sql ....................................................................................................................... ok
+    /mnt/tests/pgtapme/cluster/role/dbo.sql ........................................................................................................................... ok
+    /mnt/tests/pgtapme/cluster/role/pg_checkpoint.sql ................................................................................................................. ok
+    /mnt/tests/pgtapme/cluster/role/pg_create_subscription.sql ........................................................................................................ ok
+    /mnt/tests/pgtapme/cluster/role/pg_database_owner.sql ............................................................................................................. ok
+    /mnt/tests/pgtapme/cluster/role/pg_execute_server_program.sql ..................................................................................................... ok
+    .
+    .
+    .
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/sqitch/tables/tags/indexes/tags_pkey.sql ............................................................................. ok
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/sqitch/tables/tags/indexes/tags_project_tag_key.sql .................................................................. ok
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/sqitch/tables/tags/tags.sql .......................................................................................... ok
+    All tests successful.
+    Files=2520, Tests=27102, 85 wallclock secs ( 4.34 usr  2.14 sys + 50.08 cusr  5.31 csys = 61.87 CPU)
+    Result: PASS
 
+If everything went well, but if something failed you should see something output similar to:
 
+    .
+    .
+    .
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_dow/indexes/lkp_dow_short_name_ic_uidx.sql ........................................................ ok
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_dow/lkp_dow.sql ................................................................................... 1/20
+    not ok 6 - Table pgtapme.lkp_dow should have the correct columns.
+    # Failed test 6: "Table pgtapme.lkp_dow should have the correct columns."
+    #     Extra columns:
+    #         ive_broken_it
+    # Looks like you failed 1 test of 20
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_dow/lkp_dow.sql ................................................................................... Failed 1/20 subtests
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_mth/columns/fk.sql ................................................................................ ok
+    .
+    .
+    .
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/sqitch/tables/tags/indexes/tags_pkey.sql ............................................................................. ok
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/sqitch/tables/tags/indexes/tags_project_tag_key.sql .................................................................. ok
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/sqitch/tables/tags/tags.sql .......................................................................................... ok
 
+    Test Summary Report
+    -------------------
+    /mnt/tests/pgtapme/databases/pgtapme/schemas/pgtapme/tables/lkp_dow/lkp_dow.sql                                                                                 (Wstat: 0 Tests: 20 Failed: 1)
+    Failed test:  6
+    Files=2479, Tests=26589, 79 wallclock secs ( 4.09 usr  2.30 sys + 44.94 cusr  5.06 csys = 56.39 CPU)
+    Result: FAIL
 
+And there you have it. A complete suite of pgTAP tests, just what DBA's always wanted developers todo - DEVELOP DATABASE SCHEMA TESTS :)
 
-[target "pgtapme"]
-	uri = db:pg://dbo:mysecretpassword@db:5432/pgtapme
+I've provided the original [pgtapme-v1.0.tgz](pg_prove/pgtapme-v1.0.tgz) for reference.
+
+# Whats coming next?
+* Add a scraper to get available pgTAP tests from [pgTAP](https://pgtap.org/)
+* Determine which code.src.writers are required and create them if they don't exist or replace them if the syntax has changed
+* Determine which code.src.getters are required and create them if they don't exist or replace them if the syntax has changed
+* Determine which code.src.module_types they belong to and create new module_types or update existing module_types
+* I'm sure I'll think of more at some point
+
+Just as an FYI here. I have no idea how I'm going to acheive that, but I'm going to give it my best shot. So don't hold your breath for those releases, it may take a while :)
+
+# Copyright and License
+[MIT License](./LICENSE)
+
+[Copyright pgTAP](./copyright_pgtap.md)

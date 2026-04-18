@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        postgres-version: [13, 14, 15, 16, 17]
+        platform: [linux/amd64, linux/arm64/v8]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Set up Docker Compose
+        run: sudo apt-get install docker-compose
+
+      - name: Build and run Docker Compose
+        run: |
+          docker-compose build --build-arg POSTGRES_VERSION=${{ matrix.postgres-version }} --platform ${{ matrix.platform }}
+          docker-compose up -d
+
+      - name: Initialize the pgtapme database
+        run: docker-compose exec -T sqitch sqitch deploy pgtapme --chdir /mnt/migrations
+
+      - name: Run pgtapme.py
+        run: docker-compose exec -T app python pgtapme.py
+
+      - name: Run tests
+        id: run-tests
+        run: |
+          result=$(docker-compose exec -T pg_prove pg_prove --ext .sql -r -U dbo -h pgtapme_db -d pgtapme -p 5432 -f /mnt/tests/pgtapme)
+          echo "$result"
+          if [[ "$result" != *"All tests successful."* ]]; then
+            echo "Tests failed"
+            exit 1
+          fi
+
+      - name: Shut down Docker Compose
+        if: always()
+        run: docker-compose down

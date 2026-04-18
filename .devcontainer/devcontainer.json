@@ -16,6 +16,7 @@
     "mounts": [
         "source=${localWorkspaceFolder}/code,target=/home/vscode/code,type=bind",
         "source=${localWorkspaceFolder}/sqitch,target=/mnt/sqitch,type=bind",
-        "source=${localWorkspaceFolder}/pg_prove,target=/mnt/pg_prove,type=bind"
+        "source=${localWorkspaceFolder}/pg_prove,target=/mnt/pg_prove,type=bind",
+        "source=${localWorkspaceFolder}/code/pgtapme_generated_files,target=/mnt/tests,type=bind"
     ]
 }

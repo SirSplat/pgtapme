@@ -1,5 +1,0 @@
-%syntax-version=1.0.0
-%project=dvdrental_alt
-%uri=https://github.com/SirSplat/pgtapme.git
-
-appschema 2024-06-29T08:37:49Z sqitch <sqitch@pgtapme.co.uk> # Add application schema.

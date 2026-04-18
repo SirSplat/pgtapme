@@ -10,85 +10,45 @@ services:
     environment:
       - PYTHONUNBUFFERED=1 # Ensure the output is not buffered, useful for logging
     depends_on:
-      - manager_db
-      - pgtapme_db
-      - dvdrental_db
-      - dvdrental_alt_db
+      pgtapme_db:
+        condition: service_healthy
     command: [ "tail", "-f", "/dev/null" ] # Keeps the container running for devcontainer usage
-
-  manager_db:
-    build:
-      context: ./db/manager
-      dockerfile: Dockerfile
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mysecretpassword
-      POSTGRES_DB: postgres
-    user: postgres
-    ports:
-      - "5431:5432"
-    volumes:
-      - ./db/manager/conf.d:/etc/postgresql/conf.d
 
   pgtapme_db:
     build:
-      context: ./db/pgtapme
+      context: ./db
       dockerfile: Dockerfile
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mysecretpassword
-      POSTGRES_DB: postgres
-    user: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./db/pgtapme/conf.d:/etc/postgresql/conf.d
-
-  dvdrental_alt_db:
-    build:
-      context: ./db/dvdrental_alt
-      dockerfile: Dockerfile
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_PASSWORD: ${PGTAPME_DB_PASSWORD:-mysecretpassword}
       POSTGRES_DB: postgres
     user: postgres
     ports:
       - "5433:5432"
     volumes:
-      - ./db/dvdrental_alt/conf.d:/etc/postgresql/conf.d
-
-  dvdrental_db:
-    build:
-      context: ./db/dvdrental
-      dockerfile: Dockerfile
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mysecretpassword
-      POSTGRES_DB: postgres
-    user: postgres
-    ports:
-      - "5434:5432"
-    volumes:
-      - ./db/dvdrental/conf.d:/etc/postgresql/conf.d
+      - ./db/conf.d:/etc/postgresql/conf.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+      start_period: 5s
 
   sqitch:
     image: sqitch/sqitch
     user: sqitch
     volumes:
       - ./sqitch/.sqitch/sqitch.conf:/home/.sqitch/sqitch.conf
-      - ./sqitch/.sqitch/.pgpass:/home/.pgpass:ro
+      - ./.pgpass:/home/.pgpass:ro
       - ./sqitch/sqitch.sh:/home/sqitch.sh
-      - ./sqitch/sqitch.conf:/mnt/sqitch/sqitch.conf
-      - ./sqitch/projects/:/mnt/sqitch/
-    working_dir: /mnt/sqitch
+      - ./sqitch/migrations/:/mnt/migrations/
+      - ./sqitch/migrations/sqitch.conf:/mnt/migrations/sqitch.conf
+    working_dir: /mnt/migrations
     entrypoint: /bin/bash
     command: -c "tail -f /dev/null"
     depends_on:
-      - manager_db
-      - pgtapme_db
-      - dvdrental_db
-      - dvdrental_alt_db
+      pgtapme_db:
+        condition: service_healthy
 
   pg_prove:
     image: itheory/pg_prove
@@ -100,7 +60,5 @@ services:
     entrypoint: /bin/sh
     command: -c "tail -f /dev/null"
     depends_on:
-      - manager_db
-      - pgtapme_db
-      - dvdrental_db
-      - dvdrental_alt_db
+      pgtapme_db:
+        condition: service_healthy

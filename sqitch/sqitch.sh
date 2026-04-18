@@ -63,6 +63,6 @@ fi
 
 # Run the container with the current and home directories mounted.
 docker run --rm --network host \
-    --mount "type=bind,src=$(pwd),dst=/repo" \
+    --mount "type=bind,src=$(pwd)/sqitch/migrations,dst=/repo" \
     --mount "type=bind,src=$HOME,dst=$homedst" \
     "${passopt[@]}" "$SQITCH_IMAGE" "$@"
