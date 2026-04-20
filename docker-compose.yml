@@ -20,6 +20,8 @@ services:
     build:
       context: ./db
       dockerfile: Dockerfile
+      args:
+        PG_VERSION: ${PG_VERSION:-16}
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${PGTAPME_DB_PASSWORD:-mysecretpassword}
@@ -40,6 +42,8 @@ services:
     build:
       context: ./db/fdw_source
       dockerfile: Dockerfile
+      args:
+        PG_VERSION: ${PG_VERSION:-16}
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${PGTAPME_DB_PASSWORD:-mysecretpassword}

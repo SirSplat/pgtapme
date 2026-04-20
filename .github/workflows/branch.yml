@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v6.0.2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: "3.11"
 
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v6.0.2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: "3.11"
           cache: "pip"
@@ -48,8 +48,14 @@ jobs:
         run: pytest code/tests/
 
   build:
-    name: Docker build
+    name: Docker build (PG ${{ matrix.pg_version }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        pg_version: [13, 14, 15, 16, 17, 18]
+    env:
+      PG_VERSION: ${{ matrix.pg_version }}
     steps:
       - uses: actions/checkout@v6.0.2
 

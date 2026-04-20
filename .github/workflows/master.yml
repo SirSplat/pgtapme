@@ -14,12 +14,17 @@ concurrency:
 
 jobs:
   build-and-test:
-    name: Build and test
+    name: Build and test (PG ${{ matrix.pg_version }})
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        pg_version: [13, 14, 15, 16, 17, 18]
     env:
       PGTAPME_DB_USER: dbo
       PGTAPME_DB_PASSWORD: ${{ secrets.PGTAPME_DB_PASSWORD || 'mysecretpassword' }}
+      PG_VERSION: ${{ matrix.pg_version }}
 
     steps:
       - name: Checkout repository
@@ -102,7 +107,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v7.0.1
         with:
-          name: docker-compose-logs
+          name: docker-compose-logs-pg${{ matrix.pg_version }}
           path: docker-compose.log
 
       - name: Archive generated pgTAP files
@@ -116,7 +121,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7.0.1
         with:
-          name: pgtapme-generated-tests
+          name: pgtapme-generated-tests-pg${{ matrix.pg_version }}
           path: pgtapme-generated-tests.tar.gz
           if-no-files-found: warn
 
