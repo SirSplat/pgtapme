@@ -1879,18 +1879,3 @@ def get_foreign_table_privs(cursor: TextIO, schema_name: str, table_name: str) -
     if not records:
         logging.warning(f"No foreign table privilege info found for: {schema_name}.{table_name}")
     return records
-
-
-@log_function_call(log_level=logging.INFO, info_message="TODO: Implementation pending!")
-def get_acl_info(cursor: TextIO) -> List[str]:
-    return
-    logging.debug("Executing query to get acl info.")
-    cursor.execute(
-        """
-    """
-    )
-    records = cursor.fetchall()
-    logging.debug(f"Query executed successfully, records fetched: {records}")
-    if not records:
-        logging.warning("No acl info found.")
-    return records
