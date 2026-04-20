@@ -6,3 +6,7 @@ psql -v ON_ERROR_STOP=1 --username "postgres" --dbname "postgres" <<-ESQL
     GRANT pg_read_server_files TO dbo;
     COMMENT ON ROLE dbo IS 'Database object owner.';
 ESQL
+
+psql -v ON_ERROR_STOP=1 --username "postgres" --dbname "template1" <<-ESQL
+    CREATE EXTENSION IF NOT EXISTS pgtap;
+ESQL
