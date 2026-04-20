@@ -1421,7 +1421,8 @@ def get_data_type_info(cursor: TextIO, kinds: List[str] = None) -> List[str]:
             t.typname,
             pg_get_userbyid( t.typowner ),
             dn.nspname,
-            dt.oid
+            dt.oid,
+            dt.typtypmod
         """,
         [kinds],
     )
