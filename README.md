@@ -1,5 +1,10 @@
 # What is this
+
+[![Master CI](https://github.com/SirSplat/pgtapme/actions/workflows/master.yml/badge.svg)](https://github.com/SirSplat/pgtapme/actions/workflows/master.yml)
+
 pgTAPme is an application written in [Python](https://www.python.org/) which generates [pgTAP](https://pgtap.org/) style tests using a [PostgreSQL](https://www.postgresql.org/) database. It provides a modular and extensible framework to create tests for different aspects of your database schema. These tests can then be executed using the [pg_prove docker image](https://hub.docker.com/r/itheory/pg_prove/).
+
+**Supported versions:** PostgreSQL 13–17 · pgTAP 1.3.4
 
 # Why do this (re-invent the wheel)?
 I did this to for a few reasons:
@@ -17,6 +22,11 @@ Before starting the containers ensure you have database credentials available to
     chmod 600 .pgpass
 
 The containers default to the password `mysecretpassword`. If you prefer to use a different credential, export `PGTAPME_DB_PASSWORD` (or define it in a `.env` file that Docker Compose can read) and update the copied `.pgpass` entry to match before booting the stack.
+
+By default the stack runs PostgreSQL 16. To use a different version (13–17), export `PG_VERSION` before building:
+
+    export PG_VERSION=15
+    docker compose build
 
 Then launch the stack:
 
@@ -178,13 +188,8 @@ And there you have it. A complete suite of pgTAP tests, just what DBA's always w
 I've provided the original [pgtapme-v1.0.tgz](pg_prove/pgtapme-v1.0.tgz) for reference.
 
 # Whats coming next?
-* Add a scraper to get available pgTAP tests from [pgTAP](https://pgtap.org/)
-* Determine which code.src.writers are required and create them if they don't exist or replace them if the syntax has changed
-* Determine which code.src.getters are required and create them if they don't exist or replace them if the syntax has changed
-* Determine which code.src.module_types they belong to and create new module_types or update existing module_types
+* Add a scraper to get available pgTAP tests from [pgTAP](https://pgtap.org/) and keep writers/getters in sync with new pgTAP releases
 * I'm sure I'll think of more at some point
-
-Just as an FYI here. I have no idea how I'm going to acheive that, but I'm going to give it my best shot. So don't hold your breath for those releases, it may take a while :)
 
 # Copyright and License
 [MIT License](./LICENSE)
