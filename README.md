@@ -4,7 +4,7 @@
 
 pgTAPme is an application written in [Python](https://www.python.org/) which generates [pgTAP](https://pgtap.org/) style tests using a [PostgreSQL](https://www.postgresql.org/) database. It provides a modular and extensible framework to create tests for different aspects of your database schema. These tests can then be executed using the [pg_prove docker image](https://hub.docker.com/r/itheory/pg_prove/).
 
-**Supported versions:** PostgreSQL 13–17 · pgTAP 1.3.4
+**Supported versions:** PostgreSQL 13–18 · pgTAP 1.3.4
 
 # Why do this (re-invent the wheel)?
 I did this to for a few reasons:
@@ -23,7 +23,7 @@ Before starting the containers ensure you have database credentials available to
 
 The containers default to the password `mysecretpassword`. If you prefer to use a different credential, export `PGTAPME_DB_PASSWORD` (or define it in a `.env` file that Docker Compose can read) and update the copied `.pgpass` entry to match before booting the stack.
 
-By default the stack runs PostgreSQL 16. To use a different version (13–17), export `PG_VERSION` before building:
+By default the stack runs PostgreSQL 16. To use a different version (13–18), export `PG_VERSION` before building:
 
     export PG_VERSION=15
     docker compose build
