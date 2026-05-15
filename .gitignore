@@ -11,3 +11,4 @@ src/getters/__pycache__/
 .pytest_cache
 code/pgtapme_generated_files
 .pgpass
+.claude/settings.local.json
