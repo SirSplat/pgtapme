@@ -109,6 +109,13 @@ jobs:
         with:
           name: docker-compose-logs-pg${{ matrix.pg_version }}
           path: docker-compose.log
+          # retention-days: 14 — failure-only diagnostic surface. Two
+          # weeks is the doctrine bound per
+          # BKM/SOP/how-to-set-ci-artifact-retention.md (team_tasks #689,
+          # GHA-storage-cap dispatch 2026-05-15), long enough for Rex to
+          # investigate a master-branch regression without compounding
+          # storage cost.
+          retention-days: 14
 
       - name: Archive generated pgTAP files
         if: always()
@@ -124,6 +131,11 @@ jobs:
           name: pgtapme-generated-tests-pg${{ matrix.pg_version }}
           path: pgtapme-generated-tests.tar.gz
           if-no-files-found: warn
+          # retention-days: 7 — generated tests are reproducible from the
+          # current commit's templates. Build-artifact retention per
+          # BKM/SOP/how-to-set-ci-artifact-retention.md (team_tasks #689,
+          # GHA-storage-cap dispatch 2026-05-15).
+          retention-days: 7
 
       - name: Tear down services
         if: always()
