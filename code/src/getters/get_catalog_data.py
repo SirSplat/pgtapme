@@ -1161,6 +1161,12 @@ def get_foreign_key_info(cursor: TextIO) -> List[str]:
             c1.relname AS fk_table,
             k1.conname AS fk_name,
             string_to_array(string_agg(DISTINCT a.attname, ','), ',') AS fk_columns,
+            (
+                SELECT array_agg(att.attname ORDER BY k.ord)
+                FROM unnest(k1.conkey) WITH ORDINALITY AS k(attnum, ord)
+                JOIN pg_attribute att
+                    ON att.attrelid = k1.conrelid AND att.attnum = k.attnum
+            ) AS fk_columns_ordered,
             n2.nspname AS pk_schema,
             c2.relname AS pk_table,
             string_to_array(string_agg(DISTINCT b.attname, ','), ',') AS pk_columns
@@ -1213,6 +1219,8 @@ def get_foreign_key_info(cursor: TextIO) -> List[str]:
             n1.nspname,
             c1.relname,
             k1.conname,
+            k1.conkey,
+            k1.conrelid,
             n2.nspname,
             c2.relname
     """

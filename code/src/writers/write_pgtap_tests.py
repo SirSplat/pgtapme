@@ -1497,10 +1497,13 @@ def write_hasnt_cast(f: TextIOWrapper, source_type: str, target_type: str) -> No
 
 @log_function_call
 def write_is_indexed(
-    f: TextIOWrapper, schema_name: str, table_name: str, index_or_column: str
+    f: TextIOWrapper, schema_name: str, table_name: str, columns: List[str]
 ) -> None:
+    col_array = format_array_parameter(columns)
+    col_label = ", ".join(columns)
     f.write(
-        f"  SELECT is_indexed('{schema_name}', '{table_name}', '{index_or_column}', 'Table {schema_name}.{table_name} should have index/column {index_or_column} indexed.');\n\n"
+        f"  SELECT is_indexed('{schema_name}', '{table_name}', {col_array}, "
+        f"'FK column(s) {schema_name}.{table_name}({col_label}) should be indexed.');\n\n"
     )
 
 

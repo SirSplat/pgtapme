@@ -1,5 +1,5 @@
 import logging
-from typing import TextIO, List
+from typing import TextIO, List, Optional
 from io import TextIOWrapper
 from src.helpers import set_plan_count, create_file_path, log_function_call
 from src.getters.get_catalog_data import get_foreign_key_info
@@ -9,6 +9,7 @@ from src.writers.write_pgtap_tests import (
     write_has_table,
     write_has_column,
     write_fk_ok,
+    write_is_indexed,
     write_tests_footer,
 )
 
@@ -40,6 +41,7 @@ def process_data(cursor: TextIO, output_dir: str, module_type: str) -> None:
                     fk_table=data.fk_table,
                     fk_name=data.fk_name,
                     fk_columns=data.fk_columns,
+                    fk_columns_ordered=data.fk_columns_ordered,
                     pk_schema=data.pk_schema,
                     pk_table=data.pk_table,
                     pk_columns=data.pk_columns,
@@ -60,6 +62,7 @@ def write_tests(
     pk_schema: str,
     pk_table: str,
     pk_columns: List[str],
+    fk_columns_ordered: Optional[List[str]] = None,
 ) -> None:
     write_tests_header(f)
 
@@ -78,5 +81,16 @@ def write_tests(
     write_fk_ok(
         f, fk_schema, fk_table, fk_columns, pk_schema, pk_table, pk_columns, fk_name
     )
+
+    # Schema-lint: a single-column FK child column should be indexed (the
+    # parent's referenced column is auto-indexed; the child's referencing
+    # column is not). is_indexed does exact, full, ordered key-set equality,
+    # so it is correct and zero-noise for single-column FKs only. Multi-column
+    # FKs need the prefix-tolerant covering-index query (Silas design call 1),
+    # which is emitted by the schema_lint module type, not here, to avoid
+    # is_indexed's multi-column false positives.
+    ordered = fk_columns_ordered if fk_columns_ordered is not None else fk_columns
+    if ordered is not None and len(ordered) == 1:
+        write_is_indexed(f, fk_schema, fk_table, list(ordered))
 
     write_tests_footer(f)
