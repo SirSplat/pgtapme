@@ -1,6 +1,12 @@
 # What is this
 
-[![Master CI](https://github.com/SirSplat/pgtapme/actions/workflows/master.yml/badge.svg)](https://github.com/SirSplat/pgtapme/actions/workflows/master.yml)
+## Build status
+
+Per-leg CI status, refreshed automatically after every Master CI run. Click any cell to open the workflow's run history on GitHub Actions.
+
+| Leg          | PG 13 | PG 14 | PG 15 | PG 16 | PG 17 | PG 18 |
+|--------------|-------|-------|-------|-------|-------|-------|
+| `Master CI`  | [![](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/SirSplat/edb5f33383b2780f4dbe2ff9ac0c8e04/raw/pgtapme-pg13.json)](https://github.com/SirSplat/pgtapme/actions/workflows/master.yml) | [![](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/SirSplat/edb5f33383b2780f4dbe2ff9ac0c8e04/raw/pgtapme-pg14.json)](https://github.com/SirSplat/pgtapme/actions/workflows/master.yml) | [![](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/SirSplat/edb5f33383b2780f4dbe2ff9ac0c8e04/raw/pgtapme-pg15.json)](https://github.com/SirSplat/pgtapme/actions/workflows/master.yml) | [![](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/SirSplat/edb5f33383b2780f4dbe2ff9ac0c8e04/raw/pgtapme-pg16.json)](https://github.com/SirSplat/pgtapme/actions/workflows/master.yml) | [![](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/SirSplat/edb5f33383b2780f4dbe2ff9ac0c8e04/raw/pgtapme-pg17.json)](https://github.com/SirSplat/pgtapme/actions/workflows/master.yml) | [![](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/SirSplat/edb5f33383b2780f4dbe2ff9ac0c8e04/raw/pgtapme-pg18.json)](https://github.com/SirSplat/pgtapme/actions/workflows/master.yml) |
 
 pgTAPme is an application written in [Python](https://www.python.org/) which generates [pgTAP](https://pgtap.org/) style tests using a [PostgreSQL](https://www.postgresql.org/) database. It provides a modular and extensible framework to create tests for different aspects of your database schema. These tests can then be executed using the [pg_prove docker image](https://hub.docker.com/r/itheory/pg_prove/).
 

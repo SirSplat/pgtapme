@@ -140,3 +140,22 @@ jobs:
       - name: Tear down services
         if: always()
         run: docker compose down --volumes --remove-orphans
+
+      # Build-status presentation. Writes a shields.io-shaped JSON payload to a
+      # per-leg file in the shared status gist (vars.STATUS_GIST_ID), so the
+      # README badge matrix refreshes after every master run — and works even
+      # though this repo is public/private-agnostic because the gist itself is
+      # public. No-op when GIST_TOKEN or STATUS_GIST_ID is empty (the composite
+      # action guards both), so the workflow is safe before the secret is wired.
+      # File namespace is per-repo (pgtapme-pg<v>.json) so the one shared gist
+      # can hold every estate repo's legs without collision.
+      - name: Report build status to status gist
+        if: ${{ always() && vars.STATUS_GIST_ID != '' }}
+        uses: SirSplat/workflows/.github/actions/report-status-gist@main
+        with:
+          gist-id: ${{ vars.STATUS_GIST_ID }}
+          filename: pgtapme-pg${{ matrix.pg_version }}.json
+          label: pg${{ matrix.pg_version }}
+          message: ${{ job.status == 'success' && 'passing' || (job.status == 'cancelled' && 'cancelled' || 'failing') }}
+          color: ${{ job.status == 'success' && 'brightgreen' || (job.status == 'cancelled' && 'lightgrey' || 'red') }}
+          gh-token: ${{ secrets.GIST_TOKEN }}
