@@ -974,9 +974,20 @@ def test_write_hasnt_cast(buf):
     assert output(buf) == "  SELECT hasnt_cast('integer', 'text', 'Cast integer->text should not exist.');\n\n"
 
 
-def test_write_is_indexed(buf):
-    write_is_indexed(buf, "public", "my_table", "my_idx")
-    assert output(buf) == "  SELECT is_indexed('public', 'my_table', 'my_idx', 'Table public.my_table should have index/column my_idx indexed.');\n\n"
+def test_write_is_indexed_single_column(buf):
+    write_is_indexed(buf, "public", "my_table", ["pid"])
+    assert output(buf) == (
+        "  SELECT is_indexed('public', 'my_table', ARRAY['pid']::TEXT[], "
+        "'FK column(s) public.my_table(pid) should be indexed.');\n\n"
+    )
+
+
+def test_write_is_indexed_multi_column(buf):
+    write_is_indexed(buf, "public", "my_table", ["a", "b"])
+    assert output(buf) == (
+        "  SELECT is_indexed('public', 'my_table', ARRAY['a', 'b']::TEXT[], "
+        "'FK column(s) public.my_table(a, b) should be indexed.');\n\n"
+    )
 
 
 def test_write_hasnt_column(buf):

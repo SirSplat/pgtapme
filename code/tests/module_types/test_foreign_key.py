@@ -64,3 +64,34 @@ def test_fk_ok_always_written():
         pk_schema="public", pk_table="customers", pk_columns=["id"],
     )
     assert "SELECT fk_ok('public', 'orders', ARRAY['customer_id']::TEXT[], 'public', 'customers', ARRAY['id']::TEXT[]," in out
+
+
+def test_is_indexed_emitted_for_single_column_fk():
+    out = call_write_tests(
+        fk_schema="public", fk_table="orders", fk_columns=["customer_id"],
+        fk_columns_ordered=["customer_id"],
+    )
+    assert (
+        "SELECT is_indexed('public', 'orders', ARRAY['customer_id']::TEXT[], "
+        "'FK column(s) public.orders(customer_id) should be indexed.');" in out
+    )
+
+
+def test_is_indexed_not_emitted_for_multi_column_fk():
+    # Multi-column FKs are covered by the prefix-tolerant covering-index query
+    # in the schema_lint module type, not by is_indexed (which would
+    # false-positive on a wider prefix index). See Silas design call 1.
+    out = call_write_tests(
+        fk_schema="public", fk_table="orders", fk_columns=["a", "b"],
+        fk_columns_ordered=["a", "b"],
+    )
+    assert "is_indexed" not in out
+
+
+def test_is_indexed_falls_back_to_fk_columns_when_ordered_absent():
+    # Backward compatibility: if fk_columns_ordered is not supplied, the
+    # single-column emission still works off fk_columns.
+    out = call_write_tests(
+        fk_schema="public", fk_table="orders", fk_columns=["customer_id"],
+    )
+    assert "SELECT is_indexed('public', 'orders', ARRAY['customer_id']::TEXT[]," in out
